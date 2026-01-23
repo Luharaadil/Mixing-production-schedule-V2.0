@@ -1,9 +1,9 @@
 
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Machine, Batch, Language, MachineStatus, CycleTime } from './types';
-import { INITIAL_MACHINES, INITIAL_CYCLE_TIMES, TRANSLATIONS } from './constants';
-import MachineCard from './components/MachineCard';
-import ReportModal from './components/ReportModal';
+import { Machine, Batch, Language, MachineStatus, CycleTime } from './types.ts';
+import { INITIAL_MACHINES, INITIAL_CYCLE_TIMES, TRANSLATIONS } from './constants.tsx';
+import MachineCard from './components/MachineCard.tsx';
+import ReportModal from './components/ReportModal.tsx';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1QomV7ceg4MLr0Y6mOM7n2OoYmZgO5D0xN6A3lC13-lg/export?format=csv&gid=0';
@@ -21,13 +21,11 @@ const ChartModal: React.FC<{
 }> = ({ title, data, onClose, unit }) => {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* Background Overlay */}
       <div 
         className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm transition-opacity" 
         onClick={onClose}
       ></div>
       
-      {/* Modal Content */}
       <div className="relative w-full max-w-4xl bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl flex flex-col p-8 md:p-10 border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in duration-300">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight flex items-center gap-3">
@@ -604,28 +602,28 @@ const App: React.FC = () => {
 
                 {/* Top Pagination Controls */}
                 {totalPages > 1 && (
-                  <div className="hidden md:flex items-center gap-3 border-l border-slate-200 dark:border-slate-700 pl-8 ml-2">
+                  <div className="hidden md:flex items-center gap-2 border-l border-slate-200 dark:border-slate-700 pl-6 ml-2">
                     <button 
                       onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
-                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-primary hover:text-primary transition-all active:scale-90 disabled:opacity-20 shadow-sm"
+                      className="w-8 h-8 flex items-center justify-center rounded-lg bg-transparent hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-all active:scale-90 disabled:opacity-20"
                     >
-                      <span className="material-icons-round text-lg">chevron_left</span>
+                      <span className="material-icons-round">chevron_left</span>
                     </button>
                     
-                    <div className="flex flex-col items-center min-w-16">
-                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('page')}</span>
-                      <span className="text-lg font-black text-slate-900 dark:text-white leading-none tracking-tighter">
-                        {currentPage} <span className="text-slate-300 dark:text-slate-600 mx-0.5">/</span> {totalPages}
+                    <div className="flex flex-col items-center min-w-[50px]">
+                      <span className="text-[7px] font-black text-slate-400 uppercase tracking-widest leading-none mb-0.5">{t('page')}</span>
+                      <span className="text-sm font-black text-slate-800 dark:text-white leading-none">
+                        {currentPage} <span className="text-slate-300 dark:text-slate-600 font-medium">/</span> {totalPages}
                       </span>
                     </div>
 
                     <button 
                       onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
-                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-primary hover:text-primary transition-all active:scale-90 disabled:opacity-20 shadow-sm"
+                      className="w-8 h-8 flex items-center justify-center rounded-lg bg-transparent hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 transition-all active:scale-90 disabled:opacity-20"
                     >
-                      <span className="material-icons-round text-lg">chevron_right</span>
+                      <span className="material-icons-round">chevron_right</span>
                     </button>
                   </div>
                 )}
