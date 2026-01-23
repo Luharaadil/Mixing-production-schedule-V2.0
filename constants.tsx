@@ -69,7 +69,7 @@ export const TRANSLATIONS = {
     lot: "LOT NO",
     spec: "SPEC",
     set: "SET",
-    fin: "FIN",
+    fin: "FINISH",
     start: "START",
     end: "END",
     recv: "RECV",
@@ -88,8 +88,8 @@ export const TRANSLATIONS = {
     of: "of",
     shift_plan_progress: "Shift Plan Progress",
     cycle_efficiency: "Cycle Efficiency",
-    plan: "Plan",
-    achv: "Achv",
+    plan: "PLAN",
+    achv: "ACHIEVEMENT",
     add_machine: "Add Machine",
     unique_name: "Unique Name",
     machine_viz: "Machine Visualization",
@@ -104,7 +104,8 @@ export const TRANSLATIONS = {
     actions: "Actions",
     reg_spec: "Register Spec",
     save_close: "Save & Close",
-    upload_img: "Upload Image"
+    upload_img: "Upload Image",
+    last_update: "Last Update"
   },
   hi: {
     brand: "मैक्सिस रबर इंडिया",
@@ -125,7 +126,7 @@ export const TRANSLATIONS = {
     lot: "लॉट नंबर",
     spec: "विवरण",
     set: "निर्धारित",
-    fin: "पूर्ण",
+    fin: "समाप्त (FINISH)",
     start: "प्रारंभ",
     end: "समाप्त",
     recv: "प्राप्त",
@@ -144,8 +145,8 @@ export const TRANSLATIONS = {
     of: "का",
     shift_plan_progress: "शिफ्ट योजना प्रगति",
     cycle_efficiency: "चक्र दक्षता",
-    plan: "योजना",
-    achv: "प्राप्ति",
+    plan: "योजना (PLAN)",
+    achv: "उपलब्धि (ACHIEVEMENT)",
     add_machine: "मशीन जोड़ें",
     unique_name: "अद्वितीय नाम",
     machine_viz: "मशीन विज़ुअलाइज़ेशन",
@@ -160,7 +161,8 @@ export const TRANSLATIONS = {
     actions: "कार्रवाई",
     reg_spec: "विशिष्टता दर्ज करें",
     save_close: "सहेजें और बंद करें",
-    upload_img: "छवि अपलोड करें"
+    upload_img: "छवि अपलोड करें",
+    last_update: "अंतिम अद्यतन"
   },
   gu: {
     brand: "મેક્સિસ રબર ઇન્ડિયા",
@@ -181,7 +183,7 @@ export const TRANSLATIONS = {
     lot: "લોટ નંબર",
     spec: "સ્પેક",
     set: "સેટ",
-    fin: "ફિન",
+    fin: "સમાપ્ત (FINISH)",
     start: "શરૂ",
     end: "અંત",
     recv: "પ્રાપ્ત",
@@ -200,8 +202,8 @@ export const TRANSLATIONS = {
     of: "નું",
     shift_plan_progress: "શિફ્ટ પ્લાન પ્રગતિ",
     cycle_efficiency: "સાયકલ કાર્યક્ષમતા",
-    plan: "પ્લાન",
-    achv: "સિદ્ધિ",
+    plan: "પ્લાન (PLAN)",
+    achv: "સિદ્ધિ (ACHIEVEMENT)",
     add_machine: "મશીન ઉમેરો",
     unique_name: "અનન્ય નામ",
     machine_viz: "મશીન વિઝ્યુલાઇઝેશન",
@@ -216,7 +218,8 @@ export const TRANSLATIONS = {
     actions: "ક્રિયાઓ",
     reg_spec: "સ્પેક નોંધણી કરો",
     save_close: "સાચવો અને બંધ કરો",
-    upload_img: "છબી અપલોડ કરો"
+    upload_img: "છબી અપલોડ કરો",
+    last_update: "છેલ્લું અપડેટ"
   },
   zh: {
     brand: "瑪吉斯橡膠印度",
@@ -237,7 +240,7 @@ export const TRANSLATIONS = {
     lot: "批號",
     spec: "規格",
     set: "設定",
-    fin: "完成",
+    fin: "完成 (FINISH)",
     start: "開始",
     end: "結束",
     recv: "接收",
@@ -255,9 +258,9 @@ export const TRANSLATIONS = {
     page: "頁",
     of: "共",
     shift_plan_progress: "班次計劃進度",
-    cycle_efficiency: "循環效率",
-    plan: "計劃",
-    achv: "達成",
+    cycle_efficiency: "循環效率 (CYCLE EFFICIENCY)",
+    plan: "計劃 (PLAN)",
+    achv: "達成 (ACHIEVEMENT)",
     add_machine: "新增機器",
     unique_name: "唯一名稱",
     machine_viz: "機器可視化",
@@ -272,6 +275,7 @@ export const TRANSLATIONS = {
     actions: "操作",
     reg_spec: "註冊規格",
     save_close: "儲存並關閉",
-    upload_img: "上傳圖片"
+    upload_img: "上傳圖片",
+    last_update: "最後更新"
   }
 };

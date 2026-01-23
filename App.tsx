@@ -83,18 +83,13 @@ const App: React.FC = () => {
 
   const calculateTheoreticalFin = (machineLots: Batch[]) => {
     if (machineLots.length === 0) return 0;
-    
-    // Theoretical Target begins from the Actual Start Time of the first lot in the list.
     const firstLotWithStartTime = machineLots.find(l => l.start && l.start.includes(':'));
     if (!firstLotWithStartTime) return 0;
-    
     const firstStartTimestamp = parseDateTimeToSeconds(firstLotWithStartTime.start);
     if (!firstStartTimestamp) return 0;
-    
     const nowTimestamp = currentTime.getTime();
     let remainingSeconds = (nowTimestamp - firstStartTimestamp) / 1000;
     if (remainingSeconds <= 0) return 0;
-    
     let theoreticalCount = 0;
     for (let i = 0; i < machineLots.length; i++) {
       const lot = machineLots[i];
@@ -104,16 +99,12 @@ const App: React.FC = () => {
         return lotSpec === cycleSpec || lotSpec.includes(cycleSpec) || cycleSpec.includes(lotSpec);
       });
       const batchCycleSeconds = cycleTimeObj ? cycleTimeObj.time : 180;
-      
       const maxPossibleBatches = Math.floor(remainingSeconds / batchCycleSeconds);
       const batchesCanDo = Math.min(maxPossibleBatches, lot.set);
-      
       theoreticalCount += batchesCanDo;
       remainingSeconds -= (batchesCanDo * batchCycleSeconds);
-      
       if (remainingSeconds < batchCycleSeconds || batchesCanDo < lot.set) break;
     }
-    
     return theoreticalCount;
   };
 
@@ -165,7 +156,6 @@ const App: React.FC = () => {
         const schedShiftVal = row[21];
         const rowShift = schedShiftVal === '1' ? 'A' : schedShiftVal === '3' ? 'B' : schedShiftVal === '5' ? 'C' : '';
         const isSameDate = schedDate.includes(productionDate) || productionDate.includes(schedDate);
-        
         if (rowShift === shift && isSameDate) {
           if (!machineBatches[machineNo]) machineBatches[machineNo] = [];
           const actuals = runningDataMap[lotNo] || { fin: 0, start: '--:--', end: '--:--' };
@@ -179,7 +169,6 @@ const App: React.FC = () => {
         allLotsForMachine.sort((a, b) => (a.start !== '--:--' && b.start !== '--:--') ? a.start.localeCompare(b.start) : 0);
         const totalShiftSet = allLotsForMachine.reduce((acc, lot) => acc + lot.set, 0);
         const totalShiftFin = allLotsForMachine.reduce((acc, lot) => acc + lot.fin, 0);
-
         let lastStartedIdx = -1;
         for (let i = allLotsForMachine.length - 1; i >= 0; i--) {
           if (allLotsForMachine[i].fin > 0) {
@@ -448,7 +437,7 @@ const App: React.FC = () => {
                {isLoading && <span className="material-icons-round animate-spin text-primary text-xs md:text-base">refresh</span>}
                <button onClick={fetchSheetData} className="p-2 md:p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 transition-all active:rotate-180 duration-500 shrink-0 border border-transparent hover:border-slate-200" title="Refresh Data"><span className="material-icons-round text-lg md:text-2xl">refresh</span></button>
                <div className="hidden lg:flex flex-col items-end bg-slate-50 dark:bg-slate-900/50 px-4 py-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-inner">
-                  <span className="block text-[8px] uppercase font-black text-slate-400 leading-none mb-1">{t('updated')}</span>
+                  <span className="block text-[8px] uppercase font-black text-slate-400 leading-none mb-1">{t('last_update')}</span>
                   <span className="block text-xs font-mono font-black text-primary leading-none">
                     {sheetUpdatedTime || currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                   </span>
@@ -468,6 +457,7 @@ const App: React.FC = () => {
         </header>
 
         <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/50 custom-scrollbar pb-32">
+          {/* Main content grid. Removed redundant list-view summary row from here. */}
           <div className="grid gap-6 md:gap-6 items-stretch" style={{ gridTemplateColumns: paginatedMachines.length > 0 ? `repeat(${isMobile ? 1 : Math.min(paginatedMachines.length, 3)}, minmax(0, 1fr))` : '1fr' }}>
             {paginatedMachines.length > 0 ? paginatedMachines.map(m => (
               <MachineCard key={m.id} machine={m} lang={lang} shift={shift} date={productionDate} layoutRows={1} cycleTimes={cycleTimes} currentTime={currentTime} onOpenReport={(id) => setReportMachineId(id)} />
@@ -524,7 +514,7 @@ const App: React.FC = () => {
           <div className="relative w-full max-w-6xl bg-white dark:bg-slate-800 rounded-[2.5rem] shadow-2xl flex flex-col max-h-[95vh] overflow-hidden border border-slate-200 dark:border-slate-700">
             <div className="px-8 py-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
               <h2 className="text-2xl font-black flex items-center gap-4 tracking-tighter text-slate-900 dark:text-white"><span className="material-icons-round text-primary text-3xl">settings</span>{t('config')}</h2>
-              <button onClick={() => setConfigOpen(false)} className="p-3 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90"><span className="material-icons-round text-2xl">close</span></button>
+              <button onClick={() => setConfigOpen(false)} className="p-3 rounded-full hover:bg-slate-200 dark:hover:hover:bg-slate-700 transition-all active:scale-90"><span className="material-icons-round text-2xl">close</span></button>
             </div>
             
             <div className="flex-1 overflow-y-auto p-8 md:p-12 custom-scrollbar space-y-16">
