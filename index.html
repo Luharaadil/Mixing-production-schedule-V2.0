@@ -990,6 +990,11 @@
                     </h1>
                     
                     <div className="flex items-center gap-1 md:gap-3">
+                       <div className="flex flex-col items-center bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 px-3 py-1 rounded-xl shadow-inner mr-2">
+                          <span className="block text-[7px] uppercase font-black text-blue-400 leading-none mb-0.5 tracking-tighter">Auto-Refresh</span>
+                          <span className="block text-xs font-mono font-black text-blue-600 dark:text-blue-400 leading-none">{timeRemaining}s</span>
+                       </div>
+                       <button onClick={() => setConfigOpen(true)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 transition-all" title="System Config"><span className="material-icons-round text-lg md:text-2xl">settings</span></button>
                        {isLoading && <span className="material-icons-round animate-spin text-primary text-xs md:text-base">refresh</span>}
                        <button onClick={fetchSheetData} className="p-2 md:p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 transition-all active:rotate-180 duration-500 shrink-0 border border-transparent hover:border-slate-200" title="Refresh Data"><span className="material-icons-round text-lg md:text-2xl">refresh</span></button>
                        <div className="hidden lg:flex flex-col items-end bg-slate-50 dark:bg-slate-900/50 px-4 py-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-inner">
@@ -1025,13 +1030,28 @@
                           <span className={`text-sm md:text-lg font-black leading-none tracking-tighter ${summary.cycleAchievement >= 100 ? 'text-green-500' : (summary.cycleAchievement < 90 ? 'text-red-500' : 'text-brand-orange')}`}>{summary.cycleAchievement}%</span>
                         </div>
                         <div className="flex flex-col items-center">
-                          <span className="text-[7px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('auto_refresh')}</span>
-                          <span className="text-sm md:text-lg font-black text-slate-500 dark:text-slate-400 leading-none tracking-tighter">{timeRemaining}s</span>
+                          <span className="text-[7px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('page')}</span>
+                          <div className="flex items-center gap-1">
+                            <button 
+                              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                              disabled={currentPage === 1}
+                              className="text-xs font-black text-slate-400 hover:text-primary disabled:opacity-30"
+                            >
+                              &lt;
+                            </button>
+                            <span className="text-xs md:text-base font-black text-slate-500 dark:text-slate-400 leading-none tracking-tighter">
+                              {currentPage}/{totalPages}
+                            </span>
+                            <button 
+                              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                              disabled={currentPage === totalPages}
+                              className="text-xs font-black text-slate-400 hover:text-primary disabled:opacity-30"
+                            >
+                              &gt;
+                            </button>
+                          </div>
                         </div>
                       </div>
-                      <button onClick={() => setConfigOpen(true)} className="ml-2 p-1 text-slate-400 hover:text-primary transition-colors">
-                        <span className="material-icons-round text-sm md:text-base">settings</span>
-                      </button>
                     </div>
                   </div>
 
@@ -1047,38 +1067,8 @@
                       </div>
                     )}
                   </div>
-
-                  {totalPages > 1 && !isMobile && (
-                    <div className="flex items-center justify-center gap-4 mt-12 py-6">
-                      <button 
-                        disabled={currentPage === 1}
-                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                        className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-black hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-20 transition-all shadow-lg active:scale-95 uppercase tracking-[0.2em]"
-                      >
-                        <span className="material-icons-round text-base">chevron_left</span> {t('prev')}
-                      </button>
-                      
-                      <div className="flex items-center gap-3">
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                          <button
-                            key={page}
-                            onClick={() => setCurrentPage(page)}
-                            className={`w-14 h-14 rounded-2xl text-sm font-black transition-all flex items-center justify-center border shadow-xl ${currentPage === page ? 'bg-primary border-primary text-white scale-110 shadow-primary/40' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 hover:border-primary hover:text-primary'}`}
-                          >
-                            {page}
-                          </button>
-                        ))}
-                      </div>
-
-                      <button 
-                        disabled={currentPage === totalPages}
-                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                        className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-black hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-20 transition-all shadow-lg active:scale-95 uppercase tracking-[0.2em]"
-                      >
-                        {t('next')} <span className="material-icons-round text-base">chevron_right</span>
-                      </button>
-                    </div>
-                  )}
+                  
+                  {/* FOOTER REMOVED TO MAXIMIZE SPACE - PAGINATION NOW IN HEADER */}
                 </div>
               </main>
 
@@ -1114,6 +1104,14 @@
                                 />
                                 <p className="mt-4 text-[10px] text-slate-400 font-medium">Interval in seconds before data is re-synced with the source.</p>
                             </div>
+                          </section>
+                          
+                          <section className="flex flex-col gap-4">
+                             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-3"><span className="material-icons-round text-primary">auto_stories</span>Navigation</h3>
+                             <div className="grid grid-cols-2 gap-4">
+                                <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} className="bg-white dark:bg-slate-800 p-4 border border-slate-200 dark:border-slate-700 rounded-2xl font-black text-xs hover:bg-slate-50">Prev Page</button>
+                                <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} className="bg-white dark:bg-slate-800 p-4 border border-slate-200 dark:border-slate-700 rounded-2xl font-black text-xs hover:bg-slate-50">Next Page</button>
+                             </div>
                           </section>
 
                           <section>
