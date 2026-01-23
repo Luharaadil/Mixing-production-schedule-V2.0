@@ -31,6 +31,7 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, lang, shift, date, l
       case 'Setup Required': return { bg: 'bg-blue-500', text: 'text-white', border: 'border-blue-600', icon: 'text-blue-500' };
       case 'Maintenance': return { bg: 'bg-red-500', text: 'text-white', border: 'border-red-600', icon: 'text-red-500' };
       case 'Idle': return { bg: 'bg-yellow-500', text: 'text-white', border: 'border-yellow-600', icon: 'text-yellow-500' };
+      case 'Complete': return { bg: 'bg-indigo-500', text: 'text-white', border: 'border-indigo-600', icon: 'text-indigo-500' };
       default: return { bg: 'bg-slate-500', text: 'text-white', border: 'border-slate-600', icon: 'text-slate-400' };
     }
   };
@@ -67,7 +68,7 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, lang, shift, date, l
       <div className="px-3 py-2 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex flex-col gap-2 shrink-0">
         <div className="space-y-1">
           <div className="flex items-center justify-between text-[8px] md:text-[10px] font-bold uppercase tracking-tight">
-            <span className="text-slate-400">Shift Plan Progress</span>
+            <span className="text-slate-400">{t('shift_plan_progress')}</span>
             <span className="text-primary font-black">{totalFin} / {totalSet} ({planPercentage}%)</span>
           </div>
           <div className="relative w-full h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden border border-slate-200 dark:border-slate-600">
@@ -78,7 +79,7 @@ const MachineCard: React.FC<MachineCardProps> = ({ machine, lang, shift, date, l
         <div className="space-y-1 group cursor-pointer" onClick={() => onOpenReport(machine.id)} title="Click to view detailed calculation report">
           <div className="flex items-center justify-between text-[8px] md:text-[10px] font-bold uppercase tracking-tight">
             <div className="flex items-center gap-1">
-              <span className="text-slate-400">Cycle Efficiency</span>
+              <span className="text-slate-400">{t('cycle_efficiency')}</span>
               <span className="material-icons-round text-[10px] text-slate-300 group-hover:text-brand-orange transition-colors">info</span>
             </div>
             <span className={`${cyclePercentage < 90 ? 'text-red-500' : 'text-brand-orange'} font-black`}>{totalFin} / {targetFin} ({cyclePercentage}%)</span>

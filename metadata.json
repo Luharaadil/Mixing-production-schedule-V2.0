@@ -1,5 +1,5 @@
 {
-  "name": "MAXXIS Production Dashboard V1.4",
+  "name": "MAXXIS Production Dashboard V2.0",
   "description": "A high-performance industrial dashboard for monitoring mixing production schedules, machine statuses, and batch achievements in real-time.",
   "requestFramePermissions": [
     "camera"

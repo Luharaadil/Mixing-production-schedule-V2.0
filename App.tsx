@@ -399,7 +399,7 @@ const App: React.FC = () => {
             </div>
             <div className="bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-200 dark:border-slate-700 p-2 max-h-56 overflow-y-auto custom-scrollbar space-y-1">
               {machines.filter(m => m.type === category).map(m => (
-                <button key={m.id} onClick={() => toggleMachineVisibility(m.id)} className={`w-full flex items-center gap-4 px-4 py-2 rounded-xl transition-all text-xs font-black ${visibleIds.includes(m.id) ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-md border border-slate-200 dark:border-slate-600' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                <button key={m.id} onClick={() => toggleMachineVisibility(m.id)} className={`w-full flex items-center gap-4 px-4 py-2 rounded-xl transition-all text-xs font-black ${visibleIds.includes(m.id) ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-md border border-slate-200 dark:border-slate-700' : 'text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
                   <span className={`w-2 h-2 rounded-full ${visibleIds.includes(m.id) ? 'bg-primary shadow-[0_0_8px_rgba(14,165,233,0.5)]' : 'bg-slate-300'}`}></span>
                   {m.name}
                 </button>
@@ -410,7 +410,7 @@ const App: React.FC = () => {
           <section>
             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">{t('lang')}</label>
             <select value={lang} onChange={(e) => setLang(e.target.value as Language)} className="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 cursor-pointer outline-none transition-all">
-              <option value="en">English</option><option value="hi">Hindi (हिंदी)</option><option value="gu">Gujarati (ગુજરાતી)</option><option value="zh">Chinese (中文)</option>
+              <option value="en">English</option><option value="hi">Hindi (हिंदी)</option><option value="gu">Gujarati (ગુજરાતી)</option><option value="zh">繁體中文 (Traditional Chinese)</option>
             </select>
           </section>
 
@@ -448,7 +448,7 @@ const App: React.FC = () => {
                {isLoading && <span className="material-icons-round animate-spin text-primary text-xs md:text-base">refresh</span>}
                <button onClick={fetchSheetData} className="p-2 md:p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 transition-all active:rotate-180 duration-500 shrink-0 border border-transparent hover:border-slate-200" title="Refresh Data"><span className="material-icons-round text-lg md:text-2xl">refresh</span></button>
                <div className="hidden lg:flex flex-col items-end bg-slate-50 dark:bg-slate-900/50 px-4 py-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-inner">
-                  <span className="block text-[8px] uppercase font-black text-slate-400 leading-none mb-1">Last Update</span>
+                  <span className="block text-[8px] uppercase font-black text-slate-400 leading-none mb-1">{t('updated')}</span>
                   <span className="block text-xs font-mono font-black text-primary leading-none">
                     {sheetUpdatedTime || currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                   </span>
@@ -458,11 +458,11 @@ const App: React.FC = () => {
           
           <div className="flex items-center justify-center pb-5 px-2 md:px-4 overflow-x-auto no-scrollbar">
             <div className="bg-slate-100/50 dark:bg-slate-900/80 px-4 md:px-16 py-3 md:py-4 rounded-2xl md:rounded-3xl border border-slate-200 dark:border-slate-700 flex flex-wrap md:flex-nowrap gap-x-4 md:gap-x-20 gap-y-2 md:gap-y-3 shadow-xl justify-center items-center backdrop-blur-sm">
-                <div className="flex flex-col items-center"><span className="text-[7px] md:text-[10px] font-black text-slate-400 uppercase leading-none mb-1 md:mb-1.5 tracking-widest">Total Plan</span><span className="text-xs md:text-3xl font-black text-slate-800 dark:text-white leading-none tracking-tighter">{summary.totalSet}</span></div>
-                <div className="flex flex-col items-center"><span className="text-[7px] md:text-[10px] font-black text-slate-400 uppercase leading-none mb-1 md:mb-1.5 tracking-widest">Finished</span><span className="text-xs md:text-3xl font-black text-primary leading-none tracking-tighter">{summary.totalFin}</span></div>
-                <div className="flex flex-col items-center"><span className="text-[7px] md:text-[10px] font-black text-slate-400 uppercase leading-none mb-1 md:mb-1.5 tracking-widest">Plan Achievement</span><span className={`text-xs md:text-3xl font-black leading-none tracking-tighter ${summary.setAchievement >= 100 ? 'text-green-500' : 'text-primary'}`}>{summary.setAchievement}%</span></div>
+                <div className="flex flex-col items-center"><span className="text-[7px] md:text-[10px] font-black text-slate-400 uppercase leading-none mb-1 md:mb-1.5 tracking-widest">{t('plan')}</span><span className="text-xs md:text-3xl font-black text-slate-800 dark:text-white leading-none tracking-tighter">{summary.totalSet}</span></div>
+                <div className="flex flex-col items-center"><span className="text-[7px] md:text-[10px] font-black text-slate-400 uppercase leading-none mb-1 md:mb-1.5 tracking-widest">{t('fin')}</span><span className="text-xs md:text-3xl font-black text-primary leading-none tracking-tighter">{summary.totalFin}</span></div>
+                <div className="flex flex-col items-center"><span className="text-[7px] md:text-[10px] font-black text-slate-400 uppercase leading-none mb-1 md:mb-1.5 tracking-widest">{t('achv')}</span><span className={`text-xs md:text-3xl font-black leading-none tracking-tighter ${summary.setAchievement >= 100 ? 'text-green-500' : 'text-primary'}`}>{summary.setAchievement}%</span></div>
                 <div className="hidden md:block w-px h-10 bg-slate-200 dark:bg-slate-700 mx-2"></div>
-                <div className="flex flex-col items-center"><span className="text-[7px] md:text-[10px] font-black text-brand-orange uppercase leading-none mb-1 md:mb-1.5 tracking-widest">Cycle Efficiency</span><span className={`text-xs md:text-3xl font-black leading-none tracking-tighter ${summary.cycleAchievement >= 100 ? 'text-green-500' : (summary.cycleAchievement < 90 ? 'text-red-500' : 'text-brand-orange')}`}>{summary.cycleAchievement}%</span></div>
+                <div className="flex flex-col items-center"><span className="text-[7px] md:text-[10px] font-black text-brand-orange uppercase leading-none mb-1 md:mb-1.5 tracking-widest">{t('cycle_efficiency')}</span><span className={`text-xs md:text-3xl font-black leading-none tracking-tighter ${summary.cycleAchievement >= 100 ? 'text-green-500' : (summary.cycleAchievement < 90 ? 'text-red-500' : 'text-brand-orange')}`}>{summary.cycleAchievement}%</span></div>
             </div>
           </div>
         </header>
@@ -530,41 +530,41 @@ const App: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-8 md:p-12 custom-scrollbar space-y-16">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 <div className="lg:col-span-1 lg:border-r border-slate-100 dark:border-slate-700 lg:pr-12">
-                  <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-3"><span className="material-icons-round text-primary">add_circle</span>Add Machine</h3>
+                  <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-3"><span className="material-icons-round text-primary">add_circle</span>{t('add_machine')}</h3>
                   <form onSubmit={handleAddMachine} className="bg-slate-50 dark:bg-slate-900/30 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-700 space-y-8">
                     <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Unique Name</label>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">{t('unique_name')}</label>
                       <input type="text" value={newMachineName} onChange={(e) => setNewMachineName(e.target.value)} placeholder="e.g. BM-10" className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 transition-all" required />
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Department</label>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">{t('dept')}</label>
                       <select value={newMachineCategory} onChange={(e) => setNewMachineCategory(e.target.value as any)} className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 cursor-pointer transition-all">
-                        <option value="mixer">Mixer</option>
-                        <option value="preparation">Preparation</option>
+                        <option value="mixer">{t('mixer')}</option>
+                        <option value="preparation">{t('prep')}</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 text-center">Machine Visualization</label>
+                      <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 text-center">{t('machine_viz')}</label>
                       <div className="flex flex-col items-center gap-4">
                         <div className="w-full h-48 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-[2rem] flex items-center justify-center overflow-hidden bg-white dark:bg-slate-800 relative group cursor-pointer transition-all hover:border-primary/50 hover:bg-slate-50 dark:hover:bg-slate-700/50" onClick={() => fileInputRef.current?.click()}>
-                          {newMachinePicture ? <img src={newMachinePicture} alt="Preview" className="w-full h-full object-cover" /> : <div className="flex flex-col items-center text-slate-300 group-hover:text-primary transition-all duration-300"><span className="material-icons-round text-5xl mb-3">add_a_photo</span><span className="text-[10px] font-black uppercase tracking-[0.2em]">Upload Image</span></div>}
+                          {newMachinePicture ? <img src={newMachinePicture} alt="Preview" className="w-full h-full object-cover" /> : <div className="flex flex-col items-center text-slate-300 group-hover:text-primary transition-all duration-300"><span className="material-icons-round text-5xl mb-3">add_a_photo</span><span className="text-[10px] font-black uppercase tracking-[0.2em]">{t('upload_img')}</span></div>}
                         </div>
                         <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
                       </div>
                     </div>
-                    <button type="submit" className="w-full bg-primary hover:bg-primary-600 text-white font-black py-5 px-8 rounded-2xl transition-all shadow-2xl shadow-primary/20 active:scale-95 uppercase tracking-widest text-[10px]">Add Machine</button>
+                    <button type="submit" className="w-full bg-primary hover:bg-primary-600 text-white font-black py-5 px-8 rounded-2xl transition-all shadow-2xl shadow-primary/20 active:scale-95 uppercase tracking-widest text-[10px]">{t('add_machine')}</button>
                   </form>
                 </div>
 
                 <div className="lg:col-span-2">
-                  <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-3"><span className="material-icons-round text-primary">view_list</span>Fleet Management</h3>
+                  <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-3"><span className="material-icons-round text-primary">view_list</span>{t('fleet_mgmt')}</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-h-[650px] overflow-y-auto pr-4 custom-scrollbar">
                     {machines.map(m => (
                       <div key={m.id} className="flex flex-col bg-slate-50 dark:bg-slate-900/50 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 group hover:shadow-xl transition-all duration-300">
                         <div className="flex items-center justify-between mb-5">
                           <div className="flex items-center gap-5 overflow-hidden">
                             {m.pictureUrl ? <div className="w-16 h-16 rounded-2xl bg-slate-200 overflow-hidden shrink-0 border border-slate-300 dark:border-slate-600 shadow-lg"><img src={m.pictureUrl} className="w-full h-full object-cover" /></div> : <div className={`w-4 h-4 rounded-full ${m.status === 'Running' ? 'bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.6)]' : 'bg-slate-300'} shrink-0`} />}
-                            <div className="truncate"><span className="font-black text-lg text-slate-800 dark:text-slate-100 tracking-tighter">{m.name}</span><p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{m.type}</p></div>
+                            <div className="truncate"><span className="font-black text-lg text-slate-800 dark:text-slate-100 tracking-tighter">{m.name}</span><p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{t(m.type)}</p></div>
                           </div>
                           <button onClick={() => handleDeleteMachine(m.id)} className="text-slate-300 hover:text-red-500 transition-colors p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10" title="Delete Machine"><span className="material-icons-round text-2xl">delete_outline</span></button>
                         </div>
@@ -588,19 +588,19 @@ const App: React.FC = () => {
               </div>
 
               <div className="border-t border-slate-100 dark:border-slate-700 pt-16">
-                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-3"><span className="material-icons-round text-primary">timer</span>Production Specs</h3>
+                <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-3"><span className="material-icons-round text-primary">timer</span>{t('prod_specs')}</h3>
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
                   <div className="lg:col-span-1">
                     <form onSubmit={handleAddCycleTime} className="bg-slate-50 dark:bg-slate-900/30 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-700 space-y-8">
-                      <div><label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Spec Identifier</label><input type="text" value={newCycleName} onChange={(e) => setNewCycleName(e.target.value)} placeholder="e.g. Tread 101" className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 transition-all" required /></div>
-                      <div><label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Std. Time (Sec)</label><input type="number" value={newCycleTime} onChange={(e) => setNewCycleTime(e.target.value)} placeholder="e.g. 180" className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 transition-all" required /></div>
+                      <div><label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">{t('spec_id')}</label><input type="text" value={newCycleName} onChange={(e) => setNewCycleName(e.target.value)} placeholder="e.g. Tread 101" className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 transition-all" required /></div>
+                      <div><label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">{t('std_time')}</label><input type="number" value={newCycleTime} onChange={(e) => setNewCycleTime(e.target.value)} placeholder="e.g. 180" className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 transition-all" required /></div>
                       <div>
-                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Machine Type</label>
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">{t('machine_type')}</label>
                         <select value={newCycleMachineType} onChange={(e) => setNewCycleMachineType(e.target.value)} className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 cursor-pointer transition-all">
-                          <option value="Mixer">Mixer</option><option value="Cutting">Cutting</option><option value="Chemical">Chemical</option>
+                          <option value="Mixer">{t('mixer')}</option><option value="Cutting">Cutting</option><option value="Chemical">Chemical</option>
                         </select>
                       </div>
-                      <button type="submit" className="w-full bg-slate-900 dark:bg-slate-700 text-white font-black py-5 px-8 rounded-2xl hover:bg-black transition-all shadow-xl active:scale-95 uppercase tracking-widest text-[10px]">Register Spec</button>
+                      <button type="submit" className="w-full bg-slate-900 dark:bg-slate-700 text-white font-black py-5 px-8 rounded-2xl hover:bg-black transition-all shadow-xl active:scale-95 uppercase tracking-widest text-[10px]">{t('reg_spec')}</button>
                     </form>
                   </div>
                   <div className="lg:col-span-3">
@@ -609,10 +609,10 @@ const App: React.FC = () => {
                         <table className="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
                           <thead className="bg-slate-50 dark:bg-slate-900/50 sticky top-0 z-20">
                             <tr>
-                              <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Spec Name</th>
-                              <th className="px-8 py-5 text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Category</th>
-                              <th className="px-8 py-5 text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Duration</th>
-                              <th className="px-8 py-5 text-right text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Actions</th>
+                              <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{t('spec_name')}</th>
+                              <th className="px-8 py-5 text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{t('category')}</th>
+                              <th className="px-8 py-5 text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{t('duration')}</th>
+                              <th className="px-8 py-5 text-right text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{t('actions')}</th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
@@ -638,7 +638,7 @@ const App: React.FC = () => {
             </div>
 
             <div className="p-8 border-t border-slate-100 dark:border-slate-700 flex justify-end bg-slate-50 dark:bg-slate-900/50">
-              <button onClick={() => setConfigOpen(false)} className="px-16 py-5 bg-primary hover:bg-primary-600 text-white font-black rounded-2xl shadow-2xl shadow-primary/20 hover:opacity-90 active:scale-95 transition-all uppercase tracking-[0.2em] text-[10px]">Save & Close</button>
+              <button onClick={() => setConfigOpen(false)} className="px-16 py-5 bg-primary hover:bg-primary-600 text-white font-black rounded-2xl shadow-2xl shadow-primary/20 hover:opacity-90 active:scale-95 transition-all uppercase tracking-[0.2em] text-[10px]">{t('save_close')}</button>
             </div>
           </div>
         </div>

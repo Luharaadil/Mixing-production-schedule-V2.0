@@ -16,7 +16,8 @@ export default defineConfig(({ mode }) => {
       },
       resolve: {
         alias: {
-          '@': path.resolve(process.cwd(), '.'),
+          // Fix: Use path.resolve('.') instead of process.cwd() to resolve type error on 'cwd' property
+          '@': path.resolve('.'),
         }
       }
     };
