@@ -457,7 +457,16 @@ const App: React.FC = () => {
         </header>
 
         <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/50 custom-scrollbar pb-32">
-          {/* Main content grid. Removed redundant list-view summary row from here. */}
+          {/* Summary Row for List View (Added Overall Efficiency) */}
+          <div className="mb-6 flex justify-center">
+            <div className="bg-white dark:bg-slate-800/80 px-6 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 flex flex-wrap justify-center gap-8 md:gap-12 shadow-sm backdrop-blur-sm">
+                <div className="flex flex-col items-center"><span className="text-[9px] font-black text-slate-400 uppercase mb-1 tracking-widest">{t('plan')}</span><span className="text-lg font-black text-slate-800 dark:text-white leading-none">{summary.totalSet}</span></div>
+                <div className="flex flex-col items-center"><span className="text-[9px] font-black text-slate-400 uppercase mb-1 tracking-widest">{t('fin')}</span><span className="text-lg font-black text-primary leading-none">{summary.totalFin}</span></div>
+                <div className="flex flex-col items-center"><span className="text-[9px] font-black text-slate-400 uppercase mb-1 tracking-widest">{t('achv')}</span><span className={`text-lg font-black leading-none ${summary.setAchievement >= 100 ? 'text-green-500' : 'text-primary'}`}>{summary.setAchievement}%</span></div>
+                <div className="flex flex-col items-center"><span className="text-[9px] font-black text-brand-orange uppercase mb-1 tracking-widest">{t('cycle_efficiency')}</span><span className={`text-lg font-black leading-none ${summary.cycleAchievement >= 100 ? 'text-green-500' : (summary.cycleAchievement < 90 ? 'text-red-500' : 'text-brand-orange')}`}>{summary.cycleAchievement}%</span></div>
+            </div>
+          </div>
+
           <div className="grid gap-6 md:gap-6 items-stretch" style={{ gridTemplateColumns: paginatedMachines.length > 0 ? `repeat(${isMobile ? 1 : Math.min(paginatedMachines.length, 3)}, minmax(0, 1fr))` : '1fr' }}>
             {paginatedMachines.length > 0 ? paginatedMachines.map(m => (
               <MachineCard key={m.id} machine={m} lang={lang} shift={shift} date={productionDate} layoutRows={1} cycleTimes={cycleTimes} currentTime={currentTime} onOpenReport={(id) => setReportMachineId(id)} />
@@ -514,7 +523,7 @@ const App: React.FC = () => {
           <div className="relative w-full max-w-6xl bg-white dark:bg-slate-800 rounded-[2.5rem] shadow-2xl flex flex-col max-h-[95vh] overflow-hidden border border-slate-200 dark:border-slate-700">
             <div className="px-8 py-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between bg-slate-50 dark:bg-slate-900/50">
               <h2 className="text-2xl font-black flex items-center gap-4 tracking-tighter text-slate-900 dark:text-white"><span className="material-icons-round text-primary text-3xl">settings</span>{t('config')}</h2>
-              <button onClick={() => setConfigOpen(false)} className="p-3 rounded-full hover:bg-slate-200 dark:hover:hover:bg-slate-700 transition-all active:scale-90"><span className="material-icons-round text-2xl">close</span></button>
+              <button onClick={() => setConfigOpen(false)} className="p-3 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-all active:scale-90"><span className="material-icons-round text-2xl">close</span></button>
             </div>
             
             <div className="flex-1 overflow-y-auto p-8 md:p-12 custom-scrollbar space-y-16">
