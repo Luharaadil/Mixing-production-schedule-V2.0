@@ -4,8 +4,99 @@ import { Machine, Batch, Language, MachineStatus, CycleTime } from './types';
 import { INITIAL_MACHINES, INITIAL_CYCLE_TIMES, TRANSLATIONS } from './constants';
 import MachineCard from './components/MachineCard';
 import ReportModal from './components/ReportModal';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts';
 
 const SHEET_URL = 'https://docs.google.com/spreadsheets/d/1QomV7ceg4MLr0Y6mOM7n2OoYmZgO5D0xN6A3lC13-lg/export?format=csv&gid=0';
+
+interface ChartDataItem {
+  name: string;
+  value: number;
+}
+
+const ChartModal: React.FC<{ 
+  title: string; 
+  data: ChartDataItem[]; 
+  onClose: () => void;
+  unit: string;
+}> = ({ title, data, onClose, unit }) => {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      {/* Background Overlay */}
+      <div 
+        className="absolute inset-0 bg-slate-900/80 backdrop-blur-sm transition-opacity" 
+        onClick={onClose}
+      ></div>
+      
+      {/* Modal Content */}
+      <div className="relative w-full max-w-4xl bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl flex flex-col p-8 md:p-10 border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in duration-300">
+        <div className="flex items-center justify-between mb-8">
+          <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight flex items-center gap-3">
+            <span className="material-icons-round text-primary text-3xl">analytics</span>
+            {title}
+          </h2>
+          <button 
+            onClick={onClose} 
+            className="p-3 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-all active:scale-90"
+          >
+            <span className="material-icons-round text-2xl text-slate-500">close</span>
+          </button>
+        </div>
+
+        <div className="w-full h-[400px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 20 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+              <XAxis 
+                dataKey="name" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
+              />
+              <YAxis 
+                domain={[0, 150]} 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
+              />
+              <Tooltip 
+                cursor={{ fill: 'transparent' }}
+                contentStyle={{ 
+                  borderRadius: '16px', 
+                  border: 'none', 
+                  boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)', 
+                  backgroundColor: '#1e293b',
+                  color: '#fff',
+                  fontSize: '14px',
+                  fontWeight: '800',
+                  padding: '12px'
+                }}
+                itemStyle={{ color: '#0ea5e9' }}
+                formatter={(value: number) => [`${value}${unit}`, title]}
+              />
+              <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={40}>
+                {data.map((entry, index) => (
+                  <Cell 
+                    key={`cell-${index}`} 
+                    fill={entry.value < 90 ? '#ef4444' : entry.value >= 100 ? '#22c55e' : '#0ea5e9'} 
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        
+        <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-700 flex justify-end">
+          <button 
+            onClick={onClose}
+            className="px-8 py-4 bg-slate-900 dark:bg-slate-700 text-white font-black rounded-2xl hover:opacity-90 active:scale-95 transition-all uppercase tracking-widest text-[10px]"
+          >
+            {TRANSLATIONS['en'].save_close}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const App: React.FC = () => {
   const [machines, setMachines] = useState<Machine[]>(INITIAL_MACHINES);
@@ -16,6 +107,8 @@ const App: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [shift, setShift] = useState<'A' | 'B' | 'C'>('A');
+  const [refreshInterval, setRefreshInterval] = useState(120);
+  const [timeRemaining, setTimeRemaining] = useState(120);
   const pageSize = 3; 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [productionDate, setProductionDate] = useState(new Date().toISOString().split('T')[0]);
@@ -25,6 +118,9 @@ const App: React.FC = () => {
   const [sheetUpdatedTime, setSheetUpdatedTime] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  const [activeChartType, setActiveChartType] = useState<'achievement' | 'efficiency' | null>(null);
+  const [chartData, setChartData] = useState<ChartDataItem[]>([]);
 
   const [newMachineName, setNewMachineName] = useState('');
   const [newMachineCategory, setNewMachineCategory] = useState<'mixer' | 'preparation'>('mixer');
@@ -50,11 +146,17 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const refreshTimer = setInterval(() => {
-      fetchSheetData();
-    }, 120000);
-    return () => clearInterval(refreshTimer);
-  }, [productionDate, shift]);
+    const countdownTimer = setInterval(() => {
+      setTimeRemaining(prev => {
+        if (prev <= 1) {
+          fetchSheetData();
+          return refreshInterval;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(countdownTimer);
+  }, [refreshInterval]);
 
   useEffect(() => {
     fetchSheetData();
@@ -215,6 +317,7 @@ const App: React.FC = () => {
           totalShiftFin
         } as Machine & { allLots: Batch[] };
       }));
+      setTimeRemaining(refreshInterval);
     } catch (error) {
       console.error('Error fetching sheet data:', error);
     } finally {
@@ -238,17 +341,14 @@ const App: React.FC = () => {
     });
   }, [machines, currentTime, cycleTimes, productionDate]);
 
+  const reportMachine = useMemo(() => {
+    if (!reportMachineId) return null;
+    return machinesWithEfficiency.find(m => m.id === reportMachineId) || null;
+  }, [reportMachineId, machinesWithEfficiency]);
+
   const filteredMachines = useMemo(() => {
     return machinesWithEfficiency.filter(m => m.type === category && visibleIds.includes(m.id));
   }, [machinesWithEfficiency, category, visibleIds]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredMachines.length / pageSize));
-
-  const paginatedMachines = useMemo(() => {
-    if (isMobile) return filteredMachines;
-    const start = (currentPage - 1) * pageSize;
-    return filteredMachines.slice(start, start + pageSize);
-  }, [filteredMachines, currentPage, pageSize, isMobile]);
 
   const summary = useMemo(() => {
     const activeMachines = filteredMachines;
@@ -265,14 +365,28 @@ const App: React.FC = () => {
     return { totalSet, totalFin, setAchievement, cycleAchievement };
   }, [filteredMachines]);
 
-  const reportMachine = useMemo(() => 
-    machinesWithEfficiency.find(m => m.id === reportMachineId) || null
-  , [reportMachineId, machinesWithEfficiency]);
+  const totalPages = Math.max(1, Math.ceil(filteredMachines.length / pageSize));
+
+  const handleOpenAchievementChart = () => {
+    const data = filteredMachines.map(m => {
+      const pct = m.totalShiftSet && m.totalShiftSet > 0 ? Math.round(((m.totalShiftFin || 0) / m.totalShiftSet) * 100) : 0;
+      return { name: m.name, value: pct };
+    });
+    setChartData(data);
+    setActiveChartType('achievement');
+  };
+
+  const handleOpenEfficiencyChart = () => {
+    const data = filteredMachines.map(m => ({ 
+      name: m.name, 
+      value: (m as any).cycleAchievement || 0 
+    }));
+    setChartData(data);
+    setActiveChartType('efficiency');
+  };
 
   const t = (key: string) => (TRANSLATIONS[lang] as any)[key] || key;
-
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
-
   const toggleMachineVisibility = (id: string) => {
     setVisibleIds(prev => prev.includes(id) ? prev.filter(v => v !== id) : [...prev, id]);
   };
@@ -327,6 +441,12 @@ const App: React.FC = () => {
       reader.readAsDataURL(file);
     }
   };
+
+  const paginatedMachines = useMemo(() => {
+    if (isMobile) return filteredMachines;
+    const start = (currentPage - 1) * pageSize;
+    return filteredMachines.slice(start, start + pageSize);
+  }, [filteredMachines, currentPage, pageSize, isMobile]);
 
   return (
     <div className={`flex h-screen w-full overflow-hidden bg-slate-50 dark:bg-slate-900 transition-colors duration-300`}>
@@ -434,6 +554,10 @@ const App: React.FC = () => {
             </h1>
             
             <div className="flex items-center gap-1 md:gap-3">
+               <div className="flex flex-col items-center bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 px-3 py-1 rounded-xl shadow-inner mr-2">
+                  <span className="block text-[7px] uppercase font-black text-blue-400 leading-none mb-0.5 tracking-tighter">Auto-Refresh</span>
+                  <span className="block text-xs font-mono font-black text-blue-600 dark:text-blue-400 leading-none">{timeRemaining}s</span>
+               </div>
                {isLoading && <span className="material-icons-round animate-spin text-primary text-xs md:text-base">refresh</span>}
                <button onClick={fetchSheetData} className="p-2 md:p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 transition-all active:rotate-180 duration-500 shrink-0 border border-transparent hover:border-slate-200" title="Refresh Data"><span className="material-icons-round text-lg md:text-2xl">refresh</span></button>
                <div className="hidden lg:flex flex-col items-end bg-slate-50 dark:bg-slate-900/50 px-4 py-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-inner">
@@ -446,21 +570,73 @@ const App: React.FC = () => {
           </div>
           
           <div className="flex items-center justify-center pb-5 px-2 md:px-4 overflow-x-auto no-scrollbar">
-            <div className="bg-slate-100/50 dark:bg-slate-900/80 px-4 md:px-16 py-3 md:py-4 rounded-2xl md:rounded-3xl border border-slate-200 dark:border-slate-700 flex flex-wrap md:flex-nowrap gap-x-4 md:gap-x-20 gap-y-2 md:gap-y-3 shadow-xl justify-center items-center backdrop-blur-sm">
+            <div className="bg-slate-100/50 dark:bg-slate-900/80 px-4 md:px-10 py-3 md:py-4 rounded-2xl md:rounded-3xl border border-slate-200 dark:border-slate-700 flex flex-wrap md:flex-nowrap gap-x-4 md:gap-x-12 gap-y-2 md:gap-y-3 shadow-xl justify-center items-center backdrop-blur-sm">
                 <div className="flex flex-col items-center"><span className="text-[7px] md:text-[10px] font-black text-slate-400 uppercase leading-none mb-1 md:mb-1.5 tracking-widest">{t('plan')}</span><span className="text-xs md:text-3xl font-black text-slate-800 dark:text-white leading-none tracking-tighter">{summary.totalSet}</span></div>
                 <div className="flex flex-col items-center"><span className="text-[7px] md:text-[10px] font-black text-slate-400 uppercase leading-none mb-1 md:mb-1.5 tracking-widest">{t('fin')}</span><span className="text-xs md:text-3xl font-black text-primary leading-none tracking-tighter">{summary.totalFin}</span></div>
-                <div className="flex flex-col items-center"><span className="text-[7px] md:text-[10px] font-black text-slate-400 uppercase leading-none mb-1 md:mb-1.5 tracking-widest">{t('achv')}</span><span className={`text-xs md:text-3xl font-black leading-none tracking-tighter ${summary.setAchievement >= 100 ? 'text-green-500' : 'text-primary'}`}>{summary.setAchievement}%</span></div>
+                
+                <div 
+                  className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform group" 
+                  onClick={handleOpenAchievementChart}
+                  title="Click to view machine comparison"
+                >
+                  <span className="text-[7px] md:text-[10px] font-black text-slate-400 uppercase leading-none mb-1 md:mb-1.5 tracking-widest flex items-center gap-1 group-hover:text-primary transition-colors">
+                    {t('achv')} <span className="material-icons-round text-[10px]">analytics</span>
+                  </span>
+                  <span className={`text-xs md:text-3xl font-black leading-none tracking-tighter ${summary.setAchievement >= 100 ? 'text-green-500' : 'text-primary'}`}>
+                    {summary.setAchievement}%
+                  </span>
+                </div>
+
                 <div className="hidden md:block w-px h-10 bg-slate-200 dark:bg-slate-700 mx-2"></div>
-                <div className="flex flex-col items-center"><span className="text-[7px] md:text-[10px] font-black text-brand-orange uppercase leading-none mb-1 md:mb-1.5 tracking-widest">{t('cycle_efficiency')}</span><span className={`text-xs md:text-3xl font-black leading-none tracking-tighter ${summary.cycleAchievement >= 100 ? 'text-green-500' : (summary.cycleAchievement < 90 ? 'text-red-500' : 'text-brand-orange')}`}>{summary.cycleAchievement}%</span></div>
+                
+                <div 
+                  className="flex flex-col items-center cursor-pointer hover:scale-105 transition-transform group" 
+                  onClick={handleOpenEfficiencyChart}
+                  title="Click to view efficiency comparison"
+                >
+                  <span className="text-[7px] md:text-[10px] font-black text-brand-orange uppercase leading-none mb-1 md:mb-1.5 tracking-widest flex items-center gap-1 group-hover:text-primary transition-colors">
+                    {t('cycle_efficiency')} <span className="material-icons-round text-[10px]">bar_chart</span>
+                  </span>
+                  <span className={`text-xs md:text-3xl font-black leading-none tracking-tighter ${summary.cycleAchievement >= 100 ? 'text-green-500' : (summary.cycleAchievement < 90 ? 'text-red-500' : 'text-brand-orange')}`}>
+                    {summary.cycleAchievement}%
+                  </span>
+                </div>
+
+                {/* Top Pagination Controls */}
+                {totalPages > 1 && (
+                  <div className="hidden md:flex items-center gap-3 border-l border-slate-200 dark:border-slate-700 pl-8 ml-2">
+                    <button 
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-primary hover:text-primary transition-all active:scale-90 disabled:opacity-20 shadow-sm"
+                    >
+                      <span className="material-icons-round text-lg">chevron_left</span>
+                    </button>
+                    
+                    <div className="flex flex-col items-center min-w-16">
+                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('page')}</span>
+                      <span className="text-lg font-black text-slate-900 dark:text-white leading-none tracking-tighter">
+                        {currentPage} <span className="text-slate-300 dark:text-slate-600 mx-0.5">/</span> {totalPages}
+                      </span>
+                    </div>
+
+                    <button 
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-primary hover:text-primary transition-all active:scale-90 disabled:opacity-20 shadow-sm"
+                    >
+                      <span className="material-icons-round text-lg">chevron_right</span>
+                    </button>
+                  </div>
+                )}
             </div>
           </div>
         </header>
 
         <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/50 custom-scrollbar pb-32">
-          {/* Main content grid. Removed redundant list-view summary row from here. */}
           <div className="grid gap-6 md:gap-6 items-stretch" style={{ gridTemplateColumns: paginatedMachines.length > 0 ? `repeat(${isMobile ? 1 : Math.min(paginatedMachines.length, 3)}, minmax(0, 1fr))` : '1fr' }}>
             {paginatedMachines.length > 0 ? paginatedMachines.map(m => (
-              <MachineCard key={m.id} machine={m} lang={lang} shift={shift} date={productionDate} layoutRows={1} cycleTimes={cycleTimes} currentTime={currentTime} onOpenReport={(id) => setReportMachineId(id)} />
+              <MachineCard key={m.id} machine={m as any} lang={lang} shift={shift} date={productionDate} layoutRows={1} cycleTimes={cycleTimes} currentTime={currentTime} onOpenReport={(id) => setReportMachineId(id)} />
             )) : (
               <div className="col-span-full py-32 flex flex-col items-center justify-center text-slate-300 dark:text-slate-700 opacity-60">
                 <span className="material-icons-round text-9xl mb-6">analytics</span>
@@ -469,43 +645,21 @@ const App: React.FC = () => {
               </div>
             )}
           </div>
-
-          {totalPages > 1 && !isMobile && (
-            <div className="flex items-center justify-center gap-4 mt-12 py-6">
-              <button 
-                disabled={currentPage === 1}
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-black hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-20 transition-all shadow-lg active:scale-95 uppercase tracking-[0.2em]"
-              >
-                <span className="material-icons-round text-base">chevron_left</span> {t('prev')}
-              </button>
-              
-              <div className="flex items-center gap-3">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`w-14 h-14 rounded-2xl text-sm font-black transition-all flex items-center justify-center border shadow-xl ${currentPage === page ? 'bg-primary border-primary text-white scale-110 shadow-primary/40' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 hover:border-primary hover:text-primary'}`}
-                  >
-                    {page}
-                  </button>
-                ))}
-              </div>
-
-              <button 
-                disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                className="flex items-center gap-3 px-8 py-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-black hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-20 transition-all shadow-lg active:scale-95 uppercase tracking-[0.2em]"
-              >
-                {t('next')} <span className="material-icons-round text-base">chevron_right</span>
-              </button>
-            </div>
-          )}
         </div>
       </main>
 
+      {/* Popup Chart Modal */}
+      {activeChartType && (
+        <ChartModal 
+          title={activeChartType === 'achievement' ? 'Shift Plan Achievement' : 'Cycle Efficiency'} 
+          data={chartData} 
+          unit="%"
+          onClose={() => setActiveChartType(null)} 
+        />
+      )}
+
       {reportMachine && (
-        <ReportModal machine={reportMachine} cycleTimes={cycleTimes} currentTime={currentTime} date={productionDate} onClose={() => setReportMachineId(null)} />
+        <ReportModal machine={reportMachine as any} cycleTimes={cycleTimes} currentTime={currentTime} date={productionDate} onClose={() => setReportMachineId(null)} />
       )}
 
       {isConfigOpen && (
@@ -520,6 +674,23 @@ const App: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-8 md:p-12 custom-scrollbar space-y-16">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                 <div className="lg:col-span-1 lg:border-r border-slate-100 dark:border-slate-700 lg:pr-12">
+                   <section className="mb-12">
+                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-3"><span className="material-icons-round text-primary">auto_mode</span>System Settings</h3>
+                    <div className="bg-slate-50 dark:bg-slate-900/30 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-700">
+                        <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Auto-Refresh Interval (s)</label>
+                        <input 
+                          type="number" 
+                          value={refreshInterval} 
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value) || 30;
+                            setRefreshInterval(val);
+                            setTimeRemaining(val);
+                          }} 
+                          className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 transition-all" 
+                        />
+                    </div>
+                  </section>
+
                   <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-3"><span className="material-icons-round text-primary">add_circle</span>{t('add_machine')}</h3>
                   <form onSubmit={handleAddMachine} className="bg-slate-50 dark:bg-slate-900/30 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-700 space-y-8">
                     <div>

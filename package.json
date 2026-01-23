@@ -1,3 +1,4 @@
+
 {
   "name": "maxxis-production-dashboard-v1.4",
   "private": true,
@@ -10,7 +11,9 @@
   },
   "dependencies": {
     "react-dom": "^19.2.3",
-    "react": "^19.2.3"
+    "react": "^19.2.3",
+    "recharts": "^2.15.0",
+    "prop-types": "^15.8.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
