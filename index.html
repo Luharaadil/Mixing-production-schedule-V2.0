@@ -12,6 +12,7 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <link rel="icon" href="data:,">
     
     <!-- React & Babel -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -76,7 +77,6 @@
   }
 }
 </script>
-<link rel="stylesheet" href="/index.css">
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors duration-300">
     <div id="root"></div>
@@ -160,16 +160,15 @@
             setup_required: "Setup Required",
             complete: "Finished",
             no_job: "No active job loaded",
-            summary_total: "Total Batches",
-            summary_fin: "Total Finished",
-            summary_pct: "Overall Achievement",
+            summary_total: "Total Plan",
+            summary_fin: "Total Finish",
+            summary_pct: "Plan Achievement",
             prev: "Prev",
             next: "Next",
             page: "Page",
             of: "of",
-            view: "View Mode",
-            overview: "Overview",
-            list: "List"
+            production_achievement: "Production Achievement",
+            cycle_efficiency: "Cycle Efficiency"
           },
           hi: {
             brand: "मैक्सिस रबर इंडिया",
@@ -199,16 +198,15 @@
             setup_required: "सेटअप अपेक्षित",
             complete: "सम्पन्न",
             no_job: "कोई कार्य लोड नहीं है",
-            summary_total: "कुल बैच",
+            summary_total: "कुल योजना",
             summary_fin: "कुल पूर्ण",
-            summary_pct: "कुल उपलब्धि",
+            summary_pct: "योजना उपलब्धि",
             prev: "पिछला",
             next: "अगला",
             page: "पृष्ठ",
             of: "का",
-            view: "दृश्य मोड",
-            overview: "अवलोकन",
-            list: "सूची"
+            production_achievement: "उत्पादन उपलब्धि",
+            cycle_efficiency: "चक्र दक्षता"
           },
           gu: {
             brand: "મેક્સિસ રબર ઇન્ડિયા",
@@ -238,16 +236,15 @@
             setup_required: "સેટઅપ જરૂરી",
             complete: "સમાપ્ત",
             no_job: "કોઈ સક્રિય જોબ લોડ નથી",
-            summary_total: "કુલ બેચ",
-            summary_fin: "કુલ સમાપ્ત",
-            summary_pct: "એકંદર સિદ્ધિ",
+            summary_total: "કુલ પ્લાન",
+            summary_fin: "કુલ ફિનિશ",
+            summary_pct: "પ્લાન સિદ્ધિ",
             prev: "પહેલું",
             next: "આગળ",
             page: "પૃષ્ઠ",
             of: "નું",
-            view: "વ્યુ મોડ",
-            overview: "ઝાંખી",
-            list: "યાદી"
+            production_achievement: "ઉત્પાદન સિદ્ધિ",
+            cycle_efficiency: "સાયકલ કાર્યક્ષમતા"
           },
           zh: {
             brand: "玛吉斯橡胶印度",
@@ -279,14 +276,13 @@
             no_job: "无活动任务",
             summary_total: "总计划",
             summary_fin: "总完成",
-            summary_pct: "整体达成",
+            summary_pct: "计划达成",
             prev: "上一页",
             next: "下一页",
             page: "页",
             of: "共",
-            view: "视图模式",
-            overview: "总览",
-            list: "清单"
+            production_achievement: "生产达成情况",
+            cycle_efficiency: "循环效率"
           }
         };
 
@@ -310,6 +306,7 @@
               case 'Setup Required': return { bg: 'bg-blue-500', text: 'text-white', border: 'border-blue-600', icon: 'text-blue-500' };
               case 'Maintenance': return { bg: 'bg-red-500', text: 'text-white', border: 'border-red-600', icon: 'text-red-500' };
               case 'Idle': return { bg: 'bg-yellow-500', text: 'text-white', border: 'border-yellow-600', icon: 'text-yellow-500' };
+              case 'Complete': return { bg: 'bg-indigo-500', text: 'text-white', border: 'border-indigo-600', icon: 'text-indigo-500' };
               default: return { bg: 'bg-slate-500', text: 'text-white', border: 'border-slate-600', icon: 'text-slate-400' };
             }
           };
@@ -556,7 +553,6 @@
           const [sheetUpdatedTime, setSheetUpdatedTime] = useState('');
           const [isLoading, setIsLoading] = useState(false);
           const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-          const [viewMode, setViewMode] = useState('list'); // 'overview' | 'list'
 
           const [newMachineName, setNewMachineName] = useState('');
           const [newMachineCategory, setNewMachineCategory] = useState('mixer');
@@ -869,7 +865,7 @@
           };
 
           return (
-            <div className={`flex h-screen w-[98%] mx-auto overflow-hidden bg-slate-50 dark:bg-slate-900 transition-colors duration-300`}>
+            <div className={`flex h-screen w-full overflow-hidden bg-slate-50 dark:bg-slate-900 transition-colors duration-300`}>
               {/* Sidebar / Options View */}
               <aside className={`bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col z-50 transition-all duration-300 
                 ${isMobile ? (isSidebarOpen ? 'fixed inset-0 w-full shadow-2xl' : 'w-0 overflow-hidden border-none pointer-events-none') : (isSidebarOpen ? 'w-80' : 'w-0 overflow-hidden border-none')}`}>
@@ -887,14 +883,6 @@
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-5 space-y-8 custom-scrollbar">
-                  <section>
-                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">{t('view')}</label>
-                    <div className="grid grid-cols-2 gap-3">
-                        <button onClick={() => setViewMode('overview')} className={`py-3 rounded-xl text-xs font-black transition-all border ${viewMode === 'overview' ? 'bg-primary text-white border-primary shadow-lg' : 'bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-500 hover:border-primary'}`}>{t('overview')}</button>
-                        <button onClick={() => setViewMode('list')} className={`py-3 rounded-xl text-xs font-black transition-all border ${viewMode === 'list' ? 'bg-primary text-white border-primary shadow-lg' : 'bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 text-slate-500 hover:border-primary'}`}>{t('list')}</button>
-                    </div>
-                  </section>
-                  
                   <section>
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">{t('date')}</label>
                     <div className="relative group cursor-pointer" onClick={() => dateInputRef.current?.showPicker()}>
@@ -994,28 +982,37 @@
                   </div>
                 </header>
                 
-                {/* OVERVIEW PAGE */}
-                <div id="overview-view" className={`flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/50 custom-scrollbar ${viewMode === 'overview' ? 'block' : 'hidden'}`}>
-                     <div className="flex items-center justify-center h-full">
-                        <div className="w-full max-w-5xl bg-slate-100/50 dark:bg-slate-900/80 px-4 md:px-16 py-12 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 grid grid-cols-2 lg:grid-cols-4 gap-12 shadow-2xl justify-center items-center backdrop-blur-sm">
-                            <div className="flex flex-col items-center"><span className="text-xs font-black text-slate-400 uppercase leading-none mb-4 tracking-widest">Total Plan</span><span className="text-4xl md:text-6xl font-black text-slate-800 dark:text-white leading-none tracking-tighter">{summary.totalSet}</span></div>
-                            <div className="flex flex-col items-center"><span className="text-xs font-black text-slate-400 uppercase leading-none mb-4 tracking-widest">Finished</span><span className="text-4xl md:text-6xl font-black text-primary leading-none tracking-tighter">{summary.totalFin}</span></div>
-                            <div className="flex flex-col items-center"><span className="text-xs font-black text-slate-400 uppercase leading-none mb-4 tracking-widest">Plan Achievement</span><span className={`text-4xl md:text-6xl font-black leading-none tracking-tighter ${summary.setAchievement >= 100 ? 'text-green-500' : 'text-primary'}`}>{summary.setAchievement}%</span></div>
-                            <div className="flex flex-col items-center"><span className="text-xs font-black text-brand-orange uppercase leading-none mb-4 tracking-widest">Cycle Efficiency</span><span className={`text-4xl md:text-6xl font-black leading-none tracking-tighter ${summary.cycleAchievement >= 100 ? 'text-green-500' : (summary.cycleAchievement < 90 ? 'text-red-500' : 'text-brand-orange')}`}>{summary.cycleAchievement}%</span></div>
+                <div className="flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/50 custom-scrollbar pb-32">
+                  
+                  {/* NEW PRODUCTION ACHIEVEMENT HEADER */}
+                  <div className="mb-10 w-full">
+                    <div className="bg-white dark:bg-slate-800/80 p-6 md:p-10 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 shadow-xl backdrop-blur-md">
+                      <h2 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mb-8 text-center md:text-left flex items-center gap-3">
+                        <span className="material-icons-round text-primary">assessment</span>
+                        {t('production_achievement')}
+                      </h2>
+                      <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 md:gap-x-12 gap-y-8">
+                        <div className="flex flex-col items-center md:items-start border-r border-slate-100 dark:border-slate-700 last:border-0">
+                          <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest mb-2">{t('summary_total')}</span>
+                          <span className="text-3xl md:text-6xl font-black text-slate-800 dark:text-white leading-none tracking-tighter">{summary.totalSet}</span>
                         </div>
-                     </div>
-                </div>
-
-                {/* LIST PAGE */}
-                <div id="list-view" className={`flex-1 overflow-y-auto p-4 md:p-6 bg-slate-50/50 dark:bg-slate-900/50 custom-scrollbar pb-32 ${viewMode === 'list' ? 'block' : 'hidden'}`}>
-                  <div className="mb-6 flex justify-center">
-                    <div className="bg-slate-100/50 dark:bg-slate-900/80 px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 flex gap-x-8 shadow-sm backdrop-blur-sm">
-                        <div className="flex flex-col items-center"><span className="text-[9px] font-black text-slate-400 uppercase mb-1 tracking-widest">Plan</span><span className="text-lg font-black text-slate-800 dark:text-white leading-none">{summary.totalSet}</span></div>
-                        <div className="flex flex-col items-center"><span className="text-[9px] font-black text-slate-400 uppercase mb-1 tracking-widest">Fin</span><span className="text-lg font-black text-primary leading-none">{summary.totalFin}</span></div>
-                        <div className="flex flex-col items-center"><span className="text-[9px] font-black text-slate-400 uppercase mb-1 tracking-widest">Achv</span><span className={`text-lg font-black leading-none ${summary.setAchievement >= 100 ? 'text-green-500' : 'text-primary'}`}>{summary.setAchievement}%</span></div>
+                        <div className="flex flex-col items-center md:items-start border-r border-slate-100 dark:border-slate-700 last:border-0">
+                          <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest mb-2">{t('summary_fin')}</span>
+                          <span className="text-3xl md:text-6xl font-black text-primary leading-none tracking-tighter">{summary.totalFin}</span>
+                        </div>
+                        <div className="flex flex-col items-center md:items-start border-r border-slate-100 dark:border-slate-700 last:border-0">
+                          <span className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest mb-2">{t('summary_pct')}</span>
+                          <span className={`text-3xl md:text-6xl font-black leading-none tracking-tighter ${summary.setAchievement >= 100 ? 'text-green-500' : 'text-primary'}`}>{summary.setAchievement}%</span>
+                        </div>
+                        <div className="flex flex-col items-center md:items-start">
+                          <span className="text-[10px] md:text-xs font-black text-brand-orange uppercase tracking-widest mb-2">{t('cycle_efficiency')}</span>
+                          <span className={`text-3xl md:text-6xl font-black leading-none tracking-tighter ${summary.cycleAchievement >= 100 ? 'text-green-500' : (summary.cycleAchievement < 90 ? 'text-red-500' : 'text-brand-orange')}`}>{summary.cycleAchievement}%</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
+                  {/* MACHINE GRID */}
                   <div className="grid gap-6 md:gap-6 items-stretch" style={{ gridTemplateColumns: paginatedMachines.length > 0 ? `repeat(${isMobile ? 1 : Math.min(paginatedMachines.length, 3)}, minmax(0, 1fr))` : '1fr' }}>
                     {paginatedMachines.length > 0 ? paginatedMachines.map(m => (
                       <MachineCard key={m.id} machine={m} lang={lang} shift={shift} date={productionDate} layoutRows={1} cycleTimes={cycleTimes} currentTime={currentTime} onOpenReport={(id) => setReportMachineId(id)} />
@@ -1199,6 +1196,5 @@
         const root = ReactDOM.createRoot(rootElement);
         root.render(<App />);
     </script>
-<script type="module" src="/index.tsx"></script>
 </body>
 </html>
