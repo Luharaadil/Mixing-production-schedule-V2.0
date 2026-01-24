@@ -326,6 +326,11 @@
           const tableFontSize = isCompact ? 'text-[8px] md:text-[10px]' : 'text-[10px] md:text-sm';
           const headerFontSize = isCompact ? 'text-sm md:text-lg' : 'text-xl md:text-2xl';
 
+          const isMixer = machine.type === 'mixer';
+          const columns = isMixer 
+            ? ['lot', 'spec', 'set', 'fin', 'start', 'end', 'recv'] 
+            : ['lot', 'spec', 'set', 'fin', 'start', 'end'];
+
           return (
             <div className={`bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col hover:shadow-lg transition-all duration-300 h-full ${machine.status === 'Setup Required' ? 'ring-2 ring-blue-400/20' : ''}`}>
               <div className={`${headerHeight} relative flex items-center justify-center overflow-hidden border-b border-slate-200 dark:border-slate-700 group bg-slate-100 dark:bg-slate-900 shrink-0 transition-all`}>
@@ -376,7 +381,7 @@
                 <table className="min-w-full divide-y divide-slate-100 dark:divide-slate-700 table-fixed">
                   <thead className="bg-slate-50 dark:bg-slate-800/80">
                     <tr>
-                      {['lot', 'spec', 'set', 'fin', 'start', 'end', 'recv'].map(col => (
+                      {columns.map(col => (
                         <th key={col} className="px-1.5 py-1.5 text-left text-[8px] md:text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-tighter">{t(col)}</th>
                       ))}
                     </tr>
@@ -384,7 +389,7 @@
                   <tbody className="divide-y divide-slate-50 dark:divide-slate-700/50 bg-white dark:bg-slate-800">
                     {[0, 1, 2, 3].map((rowIdx) => {
                       const lot = displayLots[rowIdx];
-                      if (!lot) return <tr key={`empty-${rowIdx}`} className="h-9 md:h-11"><td colSpan={7} className="px-2"></td></tr>;
+                      if (!lot) return <tr key={`empty-${rowIdx}`} className="h-9 md:h-11"><td colSpan={columns.length} className="px-2"></td></tr>;
                       const isLotActive = lot.lotNo === machine.activeLotNo;
                       const isSetup = machine.status === 'Setup Required' && isLotActive;
                       const isRunning = machine.status === 'Running' && isLotActive;
@@ -396,7 +401,7 @@
                           <td className={`px-1.5 py-1 whitespace-nowrap text-center ${tableFontSize} font-black ${lot.fin >= lot.set ? 'text-blue-500' : 'text-green-500'}`}>{lot.fin}</td>
                           <td className={`px-1.5 py-1 whitespace-nowrap font-mono text-[8px] md:text-[10px] text-slate-400`}>{lot.start.split(' ').pop()}</td>
                           <td className={`px-1.5 py-1 whitespace-nowrap font-mono text-[8px] md:text-[10px] text-slate-400`}>{lot.end.split(' ').pop()}</td>
-                          <td className={`px-1.5 py-1 whitespace-nowrap text-center ${tableFontSize} text-slate-500`}>{lot.recv}</td>
+                          {isMixer && <td className={`px-1.5 py-1 whitespace-nowrap text-center ${tableFontSize} text-slate-500`}>{lot.recv}</td>}
                         </tr>
                       );
                     })}
@@ -704,6 +709,23 @@
                 }
               });
 
+              // PRE-CALCULATE RECV MAP: Max of Column AN (index 39) where Column AH (index 33) matches lot number
+              const recvMap = {};
+              rows.forEach(row => {
+                if (row.length > 39) {
+                  const batchNo = row[33]; // Column AH
+                  const mixEndVal = row[39]; // Column AN
+                  if (batchNo && mixEndVal) {
+                    const mixEndNum = parseFloat(mixEndVal);
+                    if (!isNaN(mixEndNum)) {
+                      if (!(batchNo in recvMap) || mixEndNum > recvMap[batchNo]) {
+                        recvMap[batchNo] = mixEndNum;
+                      }
+                    }
+                  }
+                }
+              });
+
               const machineBatches = {};
               rows.slice(1).forEach(row => {
                 if (row.length < 29) return; 
@@ -720,7 +742,11 @@
                   if (!machineBatches[machineNo]) machineBatches[machineNo] = [];
                   const actuals = runningDataMap[lotNo] || { fin: 0, start: '--:--', end: '--:--' };
                   const adjustedSet = Math.max(setValue, actuals.fin);
-                  machineBatches[machineNo].push({ lotNo, spec, set: adjustedSet, fin: actuals.fin, recv: 0, start: actuals.start, end: actuals.end });
+                  
+                  // Set recv value for mixers from pre-calculated map
+                  const recvVal = recvMap[lotNo] || 0;
+                  
+                  machineBatches[machineNo].push({ lotNo, spec, set: adjustedSet, fin: actuals.fin, recv: recvVal, start: actuals.start, end: actuals.end });
                 }
               });
 
@@ -1101,8 +1127,6 @@
                       </div>
                     )}
                   </div>
-                  
-                  {/* FOOTER REMOVED TO MAXIMIZE SPACE - PAGINATION NOW IN HEADER */}
                 </div>
               </main>
 
