@@ -254,44 +254,44 @@
             refresh_interval: "રિફ્રેશ અંતરાલ (સેકન્ડ)"
           },
           zh: {
-            brand: "玛吉斯橡胶印度",
-            title: "密炼生产排程 (MRI)",
-            date: "生产日期",
-            shift: "班次选择",
-            dept: "部门",
-            mixer: "密炼机",
-            prep: "准备",
-            filter: "机器筛选",
+            brand: "瑪吉斯橡膠印度",
+            title: "密煉生產排程 (MRI)",
+            date: "生產日期",
+            shift: "班次選擇",
+            dept: "部門",
+            mixer: "密煉機",
+            prep: "準備",
+            filter: "機器篩選",
             all: "全部",
-            none: "无",
-            lang: "语言",
-            theme: "主题模式",
-            config: "系统配置",
-            updated: "更新于",
-            lot: "批号",
-            spec: "规格",
-            set: "设定",
+            none: "無",
+            lang: "語言",
+            theme: "主題模式",
+            config: "系統設定",
+            updated: "最後更新",
+            lot: "批號",
+            spec: "規格",
+            set: "設定",
             fin: "完成",
-            start: "开始",
-            end: "结束",
+            start: "開始",
+            end: "結束",
             recv: "接收",
-            running: "运行中",
-            idle: "空闲",
-            maintenance: "维护中",
-            setup_required: "需设定",
+            running: "運行中",
+            idle: "空閒",
+            maintenance: "維護中",
+            setup_required: "需設定",
             complete: "已完成",
-            no_job: "无活动任务",
-            summary_total: "总计划",
-            summary_fin: "总完成",
-            summary_pct: "计划达成",
-            prev: "上一页",
-            next: "下一页",
-            page: "页",
+            no_job: "無活動任務",
+            summary_total: "總計劃",
+            summary_fin: "總完成",
+            summary_pct: "達成率",
+            prev: "上一頁",
+            next: "下一頁",
+            page: "頁",
             of: "共",
-            production_achievement: "生产达成情况",
-            cycle_efficiency: "循环效率",
-            auto_refresh: "自动刷新",
-            refresh_interval: "刷新间隔 (秒)"
+            production_achievement: "生產達成情況",
+            cycle_efficiency: "循環效率",
+            auto_refresh: "自動更新",
+            refresh_interval: "自動更新間隔 (秒)"
           }
         };
 
@@ -1046,7 +1046,7 @@
                   <section>
                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">{t('lang')}</label>
                     <select value={lang} onChange={(e) => setLang(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-sm font-bold rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/20 cursor-pointer outline-none transition-all">
-                      <option value="en">English</option><option value="hi">Hindi (हिंदी)</option><option value="gu">Gujarati (ગુજરાતી)</option><option value="zh">Chinese (中文)</option>
+                      <option value="en">English</option><option value="hi">Hindi (हिंदी)</option><option value="gu">Gujarati (ગુજરાતી)</option><option value="zh">繁體中文 (Traditional Chinese)</option>
                     </select>
                   </section>
 
@@ -1082,14 +1082,14 @@
                     
                     <div className="flex items-center gap-1 md:gap-3">
                        <div className="flex flex-col items-center bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-800 px-3 py-1 rounded-xl shadow-inner mr-2">
-                          <span className="block text-[7px] uppercase font-black text-blue-400 leading-none mb-0.5 tracking-tighter">Auto-Refresh</span>
+                          <span className="block text-[7px] uppercase font-black text-blue-400 leading-none mb-0.5 tracking-tighter">自動更新</span>
                           <span className="block text-xs font-mono font-black text-blue-600 dark:text-blue-400 leading-none">{timeRemaining}s</span>
                        </div>
-                       <button onClick={() => setConfigOpen(true)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 transition-all" title="System Config"><span className="material-icons-round text-lg md:text-2xl">settings</span></button>
+                       <button onClick={() => setConfigOpen(true)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 transition-all" title="系統設定"><span className="material-icons-round text-lg md:text-2xl">settings</span></button>
                        {isLoading && <span className="material-icons-round animate-spin text-primary text-xs md:text-base">refresh</span>}
-                       <button onClick={fetchSheetData} className="p-2 md:p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 transition-all active:rotate-180 duration-500 shrink-0 border border-transparent hover:border-slate-200" title="Refresh Data"><span className="material-icons-round text-lg md:text-2xl">refresh</span></button>
+                       <button onClick={fetchSheetData} className="p-2 md:p-3 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-500 transition-all active:rotate-180 duration-500 shrink-0 border border-transparent hover:border-slate-200" title="更新數據"><span className="material-icons-round text-lg md:text-2xl">refresh</span></button>
                        <div className="hidden lg:flex flex-col items-end bg-slate-50 dark:bg-slate-900/50 px-4 py-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-inner">
-                          <span className="block text-[8px] uppercase font-black text-slate-400 leading-none mb-1">Last Update</span>
+                          <span className="block text-[8px] uppercase font-black text-slate-400 leading-none mb-1">最後更新</span>
                           <span className="block text-xs font-mono font-black text-primary leading-none">
                             {sheetUpdatedTime || currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                           </span>
@@ -1126,7 +1126,7 @@
                           <span className={`text-sm md:text-lg font-black leading-none tracking-tighter ${summary.cycleAchievement >= 100 ? 'text-green-500' : (summary.cycleAchievement < 90 ? 'text-red-500' : 'text-brand-orange')}`}>{summary.cycleAchievement}%</span>
                         </div>
                         <div className="hidden md:flex flex-col items-center">
-                          <span className="text-[7px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{t('page')}</span>
+                          <span className="text-[7px] md:text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">頁數</span>
                           <div className="flex items-center gap-1">
                             <button 
                               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
@@ -1158,8 +1158,8 @@
                     )) : (
                       <div className="col-span-full py-32 flex flex-col items-center justify-center text-slate-300 dark:text-slate-700 opacity-60">
                         <span className="material-icons-round text-9xl mb-6">analytics</span>
-                        <p className="text-2xl font-black uppercase tracking-[0.2em]">No data selected</p>
-                        <p className="text-sm font-bold mt-2">Activate machines in the sidebar to view metrics</p>
+                        <p className="text-2xl font-black uppercase tracking-[0.2em]">無數據選取</p>
+                        <p className="text-sm font-bold mt-2">請在側邊欄啟用機器以查看指標</p>
                       </div>
                     )}
                   </div>
@@ -1183,9 +1183,9 @@
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                         <div className="lg:col-span-1 lg:border-r border-slate-100 dark:border-slate-700 lg:pr-12 space-y-12">
                           <section>
-                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-3"><span className="material-icons-round text-primary">auto_mode</span>System Settings</h3>
+                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-3"><span className="material-icons-round text-primary">auto_mode</span>系統設定</h3>
                             <div className="bg-slate-50 dark:bg-slate-900/30 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-700">
-                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">{t('refresh_interval')}</label>
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">自動更新間隔 (秒)</label>
                                 <input 
                                   type="number" 
                                   value={refreshInterval} 
@@ -1196,48 +1196,48 @@
                                   }} 
                                   className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 transition-all" 
                                 />
-                                <p className="mt-4 text-[10px] text-slate-400 font-medium">Interval in seconds before data is re-synced with the source.</p>
+                                <p className="mt-4 text-[10px] text-slate-400 font-medium">數據與來源重新同步前的間隔秒數。</p>
                             </div>
                           </section>
                           
                           <section className="flex flex-col gap-4">
-                             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-3"><span className="material-icons-round text-primary">auto_stories</span>Navigation</h3>
+                             <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 flex items-center gap-3"><span className="material-icons-round text-primary">auto_stories</span>導覽</h3>
                              <div className="grid grid-cols-2 gap-4">
-                                <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} className="bg-white dark:bg-slate-800 p-4 border border-slate-200 dark:border-slate-700 rounded-2xl font-black text-xs hover:bg-slate-50">Prev Page</button>
-                                <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} className="bg-white dark:bg-slate-800 p-4 border border-slate-200 dark:border-slate-700 rounded-2xl font-black text-xs hover:bg-slate-50">Next Page</button>
+                                <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} className="bg-white dark:bg-slate-800 p-4 border border-slate-200 dark:border-slate-700 rounded-2xl font-black text-xs hover:bg-slate-50">上一頁</button>
+                                <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} className="bg-white dark:bg-slate-800 p-4 border border-slate-200 dark:border-slate-700 rounded-2xl font-black text-xs hover:bg-slate-50">下一頁</button>
                              </div>
                           </section>
 
                           <section>
-                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-3"><span className="material-icons-round text-primary">add_circle</span>Add Machine</h3>
+                            <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-3"><span className="material-icons-round text-primary">add_circle</span>新增機器</h3>
                             <form onSubmit={handleAddMachine} className="bg-slate-50 dark:bg-slate-900/30 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-700 space-y-8">
                               <div>
-                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Unique Name</label>
-                                <input type="text" value={newMachineName} onChange={(e) => setNewMachineName(e.target.value)} placeholder="e.g. BM-10" className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 transition-all" required />
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">唯一名稱</label>
+                                <input type="text" value={newMachineName} onChange={(e) => setNewMachineName(e.target.value)} placeholder="例如：BM-10" className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 transition-all" required />
                               </div>
                               <div>
-                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Department</label>
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">部門</label>
                                 <select value={newMachineCategory} onChange={(e) => setNewMachineCategory(e.target.value)} className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 cursor-pointer transition-all">
-                                  <option value="mixer">Mixer</option>
-                                  <option value="preparation">Preparation</option>
+                                  <option value="mixer">密煉機</option>
+                                  <option value="preparation">準備</option>
                                 </select>
                               </div>
                               <div>
-                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 text-center">Machine Visualization</label>
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3 text-center">機器可視化</label>
                                 <div className="flex flex-col items-center gap-4">
                                   <div className="w-full h-48 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-[2rem] flex items-center justify-center overflow-hidden bg-white dark:bg-slate-800 relative group cursor-pointer transition-all hover:border-primary/50 hover:bg-slate-50 dark:hover:bg-slate-700/50" onClick={() => fileInputRef.current?.click()}>
-                                    {newMachinePicture ? <img src={newMachinePicture} alt="Preview" className="w-full h-full object-cover" /> : <div className="flex flex-col items-center text-slate-300 group-hover:text-primary transition-all duration-300"><span className="material-icons-round text-5xl mb-3">add_a_photo</span><span className="text-[10px] font-black uppercase tracking-[0.2em]">Upload Image</span></div>}
+                                    {newMachinePicture ? <img src={newMachinePicture} alt="預覽" className="w-full h-full object-cover" /> : <div className="flex flex-col items-center text-slate-300 group-hover:text-primary transition-all duration-300"><span className="material-icons-round text-5xl mb-3">add_a_photo</span><span className="text-[10px] font-black uppercase tracking-[0.2em]">上傳圖片</span></div>}
                                   </div>
                                   <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
                                 </div>
                               </div>
-                              <button type="submit" className="w-full bg-primary hover:bg-primary-600 text-white font-black py-5 px-8 rounded-2xl transition-all shadow-2xl shadow-primary/20 active:scale-95 uppercase tracking-widest text-[10px]">Add Machine</button>
+                              <button type="submit" className="w-full bg-primary hover:bg-primary-600 text-white font-black py-5 px-8 rounded-2xl transition-all shadow-2xl shadow-primary/20 active:scale-95 uppercase tracking-widest text-[10px]">新增機器</button>
                             </form>
                           </section>
                         </div>
 
                         <div className="lg:col-span-2">
-                          <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-3"><span className="material-icons-round text-primary">view_list</span>Fleet Management</h3>
+                          <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-3"><span className="material-icons-round text-primary">view_list</span>機台管理</h3>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-h-[650px] overflow-y-auto pr-4 custom-scrollbar">
                             {machines.map(m => (
                               <div key={m.id} className="flex flex-col bg-slate-50 dark:bg-slate-900/50 p-6 rounded-3xl border border-slate-200 dark:border-slate-700 group hover:shadow-xl transition-all duration-300">
@@ -1246,7 +1246,7 @@
                                     {m.pictureUrl ? <div className="w-16 h-16 rounded-2xl bg-slate-200 overflow-hidden shrink-0 border border-slate-300 dark:border-slate-600 shadow-lg"><img src={m.pictureUrl} className="w-full h-full object-cover" /></div> : <div className={`w-4 h-4 rounded-full ${m.status === 'Running' ? 'bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.6)]' : 'bg-slate-300'} shrink-0`} />}
                                     <div className="truncate"><span className="font-black text-lg text-slate-800 dark:text-slate-100 tracking-tighter">{m.name}</span><p className="text-[9px] font-black uppercase tracking-widest text-slate-400">{m.type}</p></div>
                                   </div>
-                                  <button onClick={() => handleDeleteMachine(m.id)} className="text-slate-300 hover:text-red-500 transition-colors p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10" title="Delete Machine"><span className="material-icons-round text-2xl">delete_outline</span></button>
+                                  <button onClick={() => handleDeleteMachine(m.id)} className="text-slate-300 hover:text-red-500 transition-colors p-3 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/10" title="刪除機器"><span className="material-icons-round text-2xl">delete_outline</span></button>
                                 </div>
                                 <div className="relative">
                                   <input 
@@ -1254,7 +1254,7 @@
                                     value={m.status} 
                                     onChange={(e) => updateMachineStatus(m.id, e.target.value)} 
                                     className="text-xs font-black py-3.5 px-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none w-full pr-12 transition-all"
-                                    placeholder="Set Status..."
+                                    placeholder="設置狀態..."
                                   />
                                   <datalist id={`status-list-${m.id}`}>
                                     <option value="Running" /><option value="Idle" /><option value="Maintenance" /><option value="Setup Required" /><option value="Complete" />
@@ -1268,19 +1268,19 @@
                       </div>
 
                       <div className="border-t border-slate-100 dark:border-slate-700 pt-16">
-                        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-3"><span className="material-icons-round text-primary">timer</span>Production Specs</h3>
+                        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center gap-3"><span className="material-icons-round text-primary">timer</span>生產規格</h3>
                         <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
                           <div className="lg:col-span-1">
                             <form onSubmit={handleAddCycleTime} className="bg-slate-50 dark:bg-slate-900/30 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-700 space-y-8">
-                              <div><label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Spec Identifier</label><input type="text" value={newCycleName} onChange={(e) => setNewCycleName(e.target.value)} placeholder="e.g. Tread 101" className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 transition-all" required /></div>
-                              <div><label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Std. Time (Sec)</label><input type="number" value={newCycleTime} onChange={(e) => setNewCycleTime(e.target.value)} placeholder="e.g. 180" className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 transition-all" required /></div>
+                              <div><label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">規格標識</label><input type="text" value={newCycleName} onChange={(e) => setNewCycleName(e.target.value)} placeholder="例如：Tread 101" className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 transition-all" required /></div>
+                              <div><label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">標準時間 (秒)</label><input type="number" value={newCycleTime} onChange={(e) => setNewCycleTime(e.target.value)} placeholder="例如：180" className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 transition-all" required /></div>
                               <div>
-                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Machine Type</label>
+                                <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">機器類型</label>
                                 <select value={newCycleMachineType} onChange={(e) => setNewCycleMachineType(e.target.value)} className="w-full text-sm font-bold rounded-2xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-4 focus:ring-primary/10 outline-none px-5 py-4 cursor-pointer transition-all">
-                                  <option value="Mixer">Mixer</option><option value="Cutting">Cutting</option><option value="Chemical">Chemical</option>
+                                  <option value="Mixer">密煉機</option><option value="Cutting">裁斷</option><option value="Chemical">化學</option>
                                 </select>
                               </div>
-                              <button type="submit" className="w-full bg-slate-900 dark:bg-slate-700 text-white font-black py-5 px-8 rounded-2xl hover:bg-black transition-all shadow-xl active:scale-95 uppercase tracking-widest text-[10px]">Register Spec</button>
+                              <button type="submit" className="w-full bg-slate-900 dark:bg-slate-700 text-white font-black py-5 px-8 rounded-2xl hover:bg-black transition-all shadow-xl active:scale-95 uppercase tracking-widest text-[10px]">註冊規格</button>
                             </form>
                           </div>
                           <div className="lg:col-span-3">
@@ -1289,10 +1289,10 @@
                                 <table className="min-w-full divide-y divide-slate-100 dark:divide-slate-700">
                                   <thead className="bg-slate-50 dark:bg-slate-900/50 sticky top-0 z-20">
                                     <tr>
-                                      <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Spec Name</th>
-                                      <th className="px-8 py-5 text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Category</th>
-                                      <th className="px-8 py-5 text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Duration</th>
-                                      <th className="px-8 py-5 text-right text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Actions</th>
+                                      <th className="px-8 py-5 text-left text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">規格名稱</th>
+                                      <th className="px-8 py-5 text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">類別</th>
+                                      <th className="px-8 py-5 text-center text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">持續時間</th>
+                                      <th className="px-8 py-5 text-right text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">操作</th>
                                     </tr>
                                   </thead>
                                   <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
@@ -1318,7 +1318,7 @@
                     </div>
 
                     <div className="p-8 border-t border-slate-100 dark:border-slate-700 flex justify-end bg-slate-50 dark:bg-slate-900/50">
-                      <button onClick={() => setConfigOpen(false)} className="px-16 py-5 bg-primary hover:bg-primary-600 text-white font-black rounded-2xl shadow-2xl shadow-primary/20 hover:opacity-90 active:scale-95 transition-all uppercase tracking-[0.2em] text-[10px]">Save & Close</button>
+                      <button onClick={() => setConfigOpen(false)} className="px-16 py-5 bg-primary hover:bg-primary-600 text-white font-black rounded-2xl shadow-2xl shadow-primary/20 hover:opacity-90 active:scale-95 transition-all uppercase tracking-[0.2em] text-[10px]">儲存並關閉</button>
                     </div>
                   </div>
                 </div>

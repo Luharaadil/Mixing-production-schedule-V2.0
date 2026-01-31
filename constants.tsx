@@ -1,4 +1,3 @@
-
 import { Machine, CycleTime } from './types';
 
 export const INITIAL_MACHINES: Machine[] = [
@@ -211,7 +210,7 @@ export const TRANSLATIONS = {
     prod_specs: "ઉત્પાદન વિશિષ્ટતાઓ",
     spec_id: "વિશિષ્ટ આઈડેન્ટિફાયર",
     std_time: "ધોરણ સમય (સેકન્ડ)",
-    machine_type: "મશીન પ્રકાર",
+    machine_type: "મશી稱 પ્રકાર",
     spec_name: "વિશિષ્ટ નામ",
     category: "શ્રેણી",
     duration: "સમયગાળો",
@@ -223,7 +222,7 @@ export const TRANSLATIONS = {
   },
   zh: {
     brand: "瑪吉斯橡膠印度",
-    title: "密煉生產排程 (MRI)",
+    title: "混練生產排程 (MRI)",
     date: "生產日期",
     shift: "班次選擇",
     view_limit: "每頁機器數",
@@ -235,8 +234,8 @@ export const TRANSLATIONS = {
     none: "無",
     lang: "語言",
     theme: "主題模式",
-    config: "系統配置",
-    updated: "更新於",
+    config: "系統設定",
+    updated: "最後更新",
     lot: "批號",
     spec: "規格",
     set: "設定",
@@ -252,13 +251,13 @@ export const TRANSLATIONS = {
     no_job: "無活動任務",
     summary_total: "總計劃",
     summary_fin: "總完成",
-    summary_pct: "計劃達成",
+    summary_pct: "達成率",
     prev: "上一頁",
     next: "下一頁",
     page: "頁",
     of: "共",
     shift_plan_progress: "班次計劃進度",
-    cycle_efficiency: "循環效率 (CYCLE EFFICIENCY)",
+    cycle_efficiency: "循環效率",
     plan: "計劃 (PLAN)",
     achv: "達成 (ACHIEVEMENT)",
     add_machine: "新增機器",
