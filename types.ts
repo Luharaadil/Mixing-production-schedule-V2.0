@@ -1,4 +1,3 @@
-
 export type MachineStatus = string;
 
 export interface Batch {
@@ -9,6 +8,7 @@ export interface Batch {
   recv: number;
   start: string;
   end: string;
+  sequenceNumber: string;
 }
 
 export interface Machine {

@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Machine, Batch, Language, MachineStatus, CycleTime } from './types';
 import { INITIAL_MACHINES, INITIAL_CYCLE_TIMES, TRANSLATIONS } from './constants';
@@ -145,6 +144,22 @@ const App: React.FC = () => {
         }
       });
 
+      const recvMap: Record<string, number> = {};
+      rows.forEach(row => {
+        if (row.length > 39) {
+          const batchNo = row[33]; 
+          const mixEndVal = row[39]; 
+          if (batchNo && mixEndVal) {
+            const mixEndNum = parseFloat(mixEndVal);
+            if (!isNaN(mixEndNum)) {
+              if (!(batchNo in recvMap) || mixEndNum > recvMap[batchNo]) {
+                recvMap[batchNo] = mixEndNum;
+              }
+            }
+          }
+        }
+      });
+
       const machineBatches: Record<string, Batch[]> = {};
       rows.slice(1).forEach(row => {
         if (row.length < 29) return; 
@@ -159,14 +174,46 @@ const App: React.FC = () => {
         if (rowShift === shift && isSameDate) {
           if (!machineBatches[machineNo]) machineBatches[machineNo] = [];
           const actuals = runningDataMap[lotNo] || { fin: 0, start: '--:--', end: '--:--' };
+          
+          const targetMachine = machines.find(m => m.id === machineNo || m.name === machineNo);
+          const isDDPrep = targetMachine && targetMachine.type === 'preparation' && machineNo.startsWith('DD');
+          const startTime = isDDPrep ? (row[11] || '--:--') : actuals.start;
+          
           const adjustedSet = Math.max(setValue, actuals.fin);
-          machineBatches[machineNo].push({ lotNo, spec, set: adjustedSet, fin: actuals.fin, recv: 0, start: actuals.start, end: actuals.end });
+          const recvVal = recvMap[lotNo] || 0;
+          
+          machineBatches[machineNo].push({ 
+            lotNo, 
+            spec, 
+            set: adjustedSet, 
+            fin: actuals.fin, 
+            recv: recvVal, 
+            start: startTime, 
+            end: actuals.end,
+            sequenceNumber: row[16] // Column Q
+          });
         }
       });
 
+      const parseLotDate = (lot: string) => {
+        if (!lot || lot.length < 6) return 0;
+        const dd = lot.substring(0, 2);
+        const mm = lot.substring(2, 4);
+        const yy = lot.substring(4, 6);
+        return parseInt(`20${yy}${mm}${dd}`);
+      };
+
       setMachines(prev => prev.map(m => {
         let allLotsForMachine = machineBatches[m.name] || machineBatches[m.id] || [];
-        allLotsForMachine.sort((a, b) => (a.start !== '--:--' && b.start !== '--:--') ? a.start.localeCompare(b.start) : 0);
+        
+        // Multi-level sorting
+        allLotsForMachine.sort((a, b) => {
+          const dateA = parseLotDate(a.lotNo);
+          const dateB = parseLotDate(b.lotNo);
+          if (dateA !== dateB) return dateA - dateB;
+          return (a.sequenceNumber || '').localeCompare(b.sequenceNumber || '', undefined, { numeric: true });
+        });
+
         const totalShiftSet = allLotsForMachine.reduce((acc, lot) => acc + lot.set, 0);
         const totalShiftFin = allLotsForMachine.reduce((acc, lot) => acc + lot.fin, 0);
         let lastStartedIdx = -1;

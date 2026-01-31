@@ -709,12 +709,11 @@
                 }
               });
 
-              // PRE-CALCULATE RECV MAP: Max of Column AN (index 39) where Column AH (index 33) matches lot number
               const recvMap = {};
               rows.forEach(row => {
                 if (row.length > 39) {
-                  const batchNo = row[33]; // Column AH
-                  const mixEndVal = row[39]; // Column AN
+                  const batchNo = row[33]; 
+                  const mixEndVal = row[39]; 
                   if (batchNo && mixEndVal) {
                     const mixEndNum = parseFloat(mixEndVal);
                     if (!isNaN(mixEndNum)) {
@@ -729,8 +728,8 @@
               const machineBatches = {};
               rows.slice(1).forEach(row => {
                 if (row.length < 29) return; 
-                const machineNo = row[14]; // Column O
-                const lotNo = row[16];     // Column Q
+                const machineNo = row[14]; 
+                const lotNo = row[16];     
                 const spec = row[17];
                 const setValue = parseInt(row[19]) || 0;
                 const schedDate = row[28];
@@ -742,24 +741,47 @@
                   if (!machineBatches[machineNo]) machineBatches[machineNo] = [];
                   const actuals = runningDataMap[lotNo] || { fin: 0, start: '--:--', end: '--:--' };
                   
-                  // NEW DYNAMIC START TIME ASSIGNMENT
-                  // Check if machine belongs to Preparation category and name begins with DD
                   const targetMachine = machines.find(m => m.id === machineNo || m.name === machineNo);
                   const isDDPrep = targetMachine && targetMachine.type === 'preparation' && machineNo.startsWith('DD');
                   
-                  // If DD machine, extract start time from Column L (index 11)
                   const startTime = isDDPrep ? (row[11] || '--:--') : actuals.start;
-                  
                   const adjustedSet = Math.max(setValue, actuals.fin);
                   const recvVal = recvMap[lotNo] || 0;
                   
-                  machineBatches[machineNo].push({ lotNo, spec, set: adjustedSet, fin: actuals.fin, recv: recvVal, start: startTime, end: actuals.end });
+                  machineBatches[machineNo].push({ 
+                    lotNo, 
+                    spec, 
+                    set: adjustedSet, 
+                    fin: actuals.fin, 
+                    recv: recvVal, 
+                    start: startTime, 
+                    end: actuals.end,
+                    sequenceNumber: row[16] // Column Q
+                  });
                 }
               });
 
+              const parseLotDate = (lot) => {
+                if (!lot || lot.length < 6) return 0;
+                const dd = lot.substring(0, 2);
+                const mm = lot.substring(2, 4);
+                const yy = lot.substring(4, 6);
+                // Return YYYYMMDD as number for sorting
+                return parseInt(`20${yy}${mm}${dd}`);
+              };
+
               setMachines(prev => prev.map(m => {
                 let allLotsForMachine = machineBatches[m.name] || machineBatches[m.id] || [];
-                allLotsForMachine.sort((a, b) => (a.start !== '--:--' && b.start !== '--:--') ? a.start.localeCompare(b.start) : 0);
+                
+                // MULTI-LEVEL SORTING
+                allLotsForMachine.sort((a, b) => {
+                  const dateA = parseLotDate(a.lotNo);
+                  const dateB = parseLotDate(b.lotNo);
+                  if (dateA !== dateB) return dateA - dateB; // Primary: Date ascending
+                  // Secondary: sequenceNumber (Column Q) ascending
+                  return (a.sequenceNumber || '').localeCompare(b.sequenceNumber || '', undefined, { numeric: true });
+                });
+
                 const totalShiftSet = allLotsForMachine.reduce((acc, lot) => acc + lot.set, 0);
                 const totalShiftFin = allLotsForMachine.reduce((acc, lot) => acc + lot.fin, 0);
 
