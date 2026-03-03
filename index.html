@@ -590,7 +590,26 @@
 
           const isMobile = windowWidth < 768;
 
+          const fetchCycleTimes = async () => {
+            try {
+              const response = await fetch('https://script.google.com/macros/s/AKfycbzsffVp8mTOI7NW5ctuiUWSwdSfTAPurjbCRFirNfmT3pnBka4JBe7mwGXN9D5DCHN5OA/exec');
+              const data = await response.json();
+              if (Array.isArray(data) && data.length > 1) {
+                const newCycleTimes = data.slice(1).map((item, index) => ({
+                  id: index + 1,
+                  name: item[0],
+                  time: Number(item[1]),
+                  machineType: 'Mixer'
+                }));
+                setCycleTimes(newCycleTimes);
+              }
+            } catch (error) {
+              console.error('Failed to fetch cycle times', error);
+            }
+          };
+
           useEffect(() => {
+            fetchCycleTimes();
             const timer = setInterval(() => setCurrentTime(new Date()), 1000);
             const handleResize = () => setWindowWidth(window.innerWidth);
             window.addEventListener('resize', handleResize);
