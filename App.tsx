@@ -99,7 +99,7 @@ const App: React.FC = () => {
     return d.getTime();
   };
 
-  const calculateTheoreticalFin = (machineLots: Batch[]) => {
+  const calculateTheoreticalFin = (machineLots: Batch[], machineId: string) => {
     if (machineLots.length === 0) return 0;
     const firstLotWithStartTime = machineLots.find(l => l.start && l.start.includes(':'));
     if (!firstLotWithStartTime) return 0;
@@ -111,17 +111,32 @@ const App: React.FC = () => {
     let theoreticalCount = 0;
     for (let i = 0; i < machineLots.length; i++) {
       const lot = machineLots[i];
-      const cycleTimeObj = cycleTimes.find(ct => {
-        const lotSpec = lot.spec.toUpperCase().trim();
-        const cycleSpec = ct.name.toUpperCase().trim();
-        return lotSpec === cycleSpec || lotSpec.includes(cycleSpec) || cycleSpec.includes(lotSpec);
-      });
-      const batchCycleSeconds = cycleTimeObj ? cycleTimeObj.time : 180;
+      let batchCycleSeconds = 180;
+      
+      if (machineId === 'CHE03' || machineId === 'CHE04') {
+        const chemicalCycle = cycleTimes.find(ct => ct.name.toUpperCase() === 'CHEMICAL');
+        batchCycleSeconds = chemicalCycle ? chemicalCycle.time : 180;
+      } else {
+        const cycleTimeObj = cycleTimes.find(ct => {
+          const lotSpec = lot.spec.toUpperCase().trim();
+          const cycleSpec = ct.name.toUpperCase().trim();
+          return lotSpec === cycleSpec || lotSpec.includes(cycleSpec) || cycleSpec.includes(lotSpec);
+        });
+        batchCycleSeconds = cycleTimeObj ? cycleTimeObj.time : 180;
+      }
+
       const maxPossibleBatches = Math.floor(remainingSeconds / batchCycleSeconds);
       const batchesCanDo = Math.min(maxPossibleBatches, lot.set);
       theoreticalCount += batchesCanDo;
       remainingSeconds -= (batchesCanDo * batchCycleSeconds);
+      
       if (remainingSeconds < batchCycleSeconds || batchesCanDo < lot.set) break;
+      
+      if (batchesCanDo === lot.set && i < machineLots.length - 1) {
+        if (machineId === 'CHE03' || machineId === 'CHE04') {
+          remainingSeconds -= 150;
+        }
+      }
     }
     return theoreticalCount;
   };
@@ -291,7 +306,7 @@ const App: React.FC = () => {
   const machinesWithEfficiency = useMemo(() => {
     return machines.map(m => {
       const fullLots = (m as any).allLots || m.lots;
-      const theoreticalTarget = calculateTheoreticalFin(fullLots);
+      const theoreticalTarget = calculateTheoreticalFin(fullLots, m.id);
       const actualFin = m.totalShiftFin || 0;
       const cycleAchievement = theoreticalTarget > 0 
         ? Math.round((actualFin / theoreticalTarget) * 100) 
