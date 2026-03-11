@@ -108,7 +108,7 @@ const App: React.FC = () => {
         let batchCycleSeconds = 180;
         if (machineId === 'CHE03' || machineId === 'CHE04') {
           const chemicalCycle = cycleTimes.find(ct => ct.name.toUpperCase() === 'CHEMICAL');
-          batchCycleSeconds = chemicalCycle ? chemicalCycle.time : 180;
+          batchCycleSeconds = chemicalCycle ? chemicalCycle.time : 78;
         } else {
           const cycleTimeObj = cycleTimes.find(ct => {
             const lotSpec = lot.spec.toUpperCase().trim();
@@ -157,7 +157,7 @@ const App: React.FC = () => {
       
       if (machineId === 'CHE03' || machineId === 'CHE04') {
         const chemicalCycle = cycleTimes.find(ct => ct.name.toUpperCase() === 'CHEMICAL');
-        batchCycleSeconds = chemicalCycle ? chemicalCycle.time : 180;
+        batchCycleSeconds = chemicalCycle ? chemicalCycle.time : 78;
       } else {
         const cycleTimeObj = cycleTimes.find(ct => {
           const lotSpec = lot.spec.toUpperCase().trim();

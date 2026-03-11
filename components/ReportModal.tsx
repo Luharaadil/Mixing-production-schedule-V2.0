@@ -33,18 +33,30 @@ const ReportModal: React.FC<ReportModalProps> = ({ machine, cycleTimes, currentT
   let accumulatedTheoreticalTime = 0;
 
   const lotBreakdown = fullLots.map((lot, i) => {
-    const cycleTimeObj = cycleTimes.find(ct => {
-      const lotSpec = lot.spec.toUpperCase().trim();
-      const cycleSpec = ct.name.toUpperCase().trim();
-      return lotSpec === cycleSpec || lotSpec.includes(cycleSpec) || cycleSpec.includes(lotSpec);
-    });
-    const ct = cycleTimeObj ? cycleTimeObj.time : 180;
+    let ct = 180;
+    if (machine.id === 'CHE03' || machine.id === 'CHE04') {
+      const chemicalCycle = cycleTimes.find(c => c.name.toUpperCase() === 'CHEMICAL');
+      ct = chemicalCycle ? chemicalCycle.time : 78;
+    } else {
+      const cycleTimeObj = cycleTimes.find(c => {
+        const lotSpec = lot.spec.toUpperCase().trim();
+        const cycleSpec = c.name.toUpperCase().trim();
+        return lotSpec === cycleSpec || lotSpec.includes(cycleSpec) || cycleSpec.includes(lotSpec);
+      });
+      ct = cycleTimeObj ? cycleTimeObj.time : 180;
+    }
     
     const startSec = parseToSeconds(lot.start);
     const endSec = parseToSeconds(lot.end) || nowSec;
     
     // Standard duration is based on Actual Finished Quantity
-    const stdDurationMin = (lot.fin * ct) / 60;
+    let stdDurationMin = (lot.fin * ct) / 60;
+    
+    // Add 150s lot change time if it's CHE03/CHE04 and not the first lot
+    if (i > 0 && lot.fin > 0 && (machine.id === 'CHE03' || machine.id === 'CHE04')) {
+      stdDurationMin += (150 / 60);
+    }
+
     const actualDurationMin = startSec && endSec ? (endSec - startSec) / 60 : 0;
     const diffMin = actualDurationMin - stdDurationMin;
     const lotEfficiency = actualDurationMin > 0 ? Math.round((stdDurationMin / actualDurationMin) * 100) : 0;
@@ -52,7 +64,14 @@ const ReportModal: React.FC<ReportModalProps> = ({ machine, cycleTimes, currentT
     // Theoretical Target per Lot (Cumulative Logic)
     let theoreticalInLot = 0;
     if (firstStartSec) {
-      const remainingGlobalTime = totalElapsedSinceStart - accumulatedTheoreticalTime;
+      let remainingGlobalTime = totalElapsedSinceStart - accumulatedTheoreticalTime;
+      
+      // Deduct lot change time before calculating how many can fit
+      if (i > 0 && (machine.id === 'CHE03' || machine.id === 'CHE04')) {
+        remainingGlobalTime -= 150;
+        accumulatedTheoreticalTime += 150;
+      }
+      
       if (remainingGlobalTime > 0) {
         const canFit = Math.floor(remainingGlobalTime / ct);
         theoreticalInLot = Math.min(canFit, lot.set);
