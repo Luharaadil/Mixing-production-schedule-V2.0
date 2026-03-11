@@ -99,6 +99,48 @@ const App: React.FC = () => {
     return d.getTime();
   };
 
+  const calculateStandardTime = (machineLots: Batch[], machineId: string) => {
+    let standardTime = 0;
+    let lotsWithFin = 0;
+    for (let i = 0; i < machineLots.length; i++) {
+      const lot = machineLots[i];
+      if (lot.fin > 0) {
+        let batchCycleSeconds = 180;
+        if (machineId === 'CHE03' || machineId === 'CHE04') {
+          const chemicalCycle = cycleTimes.find(ct => ct.name.toUpperCase() === 'CHEMICAL');
+          batchCycleSeconds = chemicalCycle ? chemicalCycle.time : 180;
+        } else {
+          const cycleTimeObj = cycleTimes.find(ct => {
+            const lotSpec = lot.spec.toUpperCase().trim();
+            const cycleSpec = ct.name.toUpperCase().trim();
+            return lotSpec === cycleSpec || lotSpec.includes(cycleSpec) || cycleSpec.includes(lotSpec);
+          });
+          batchCycleSeconds = cycleTimeObj ? cycleTimeObj.time : 180;
+        }
+        standardTime += lot.fin * batchCycleSeconds;
+        lotsWithFin++;
+      }
+    }
+    
+    if (lotsWithFin > 1) {
+      if (machineId === 'CHE03' || machineId === 'CHE04') {
+        standardTime += (lotsWithFin - 1) * 150;
+      }
+    }
+    return standardTime;
+  };
+
+  const calculateActualTime = (machineLots: Batch[]) => {
+    if (machineLots.length === 0) return 0;
+    const firstLotWithStartTime = machineLots.find(l => l.start && l.start.includes(':'));
+    if (!firstLotWithStartTime) return 0;
+    const firstStartTimestamp = parseDateTimeToSeconds(firstLotWithStartTime.start);
+    if (!firstStartTimestamp) return 0;
+    const nowTimestamp = currentTime.getTime();
+    let actualTimeSeconds = (nowTimestamp - firstStartTimestamp) / 1000;
+    return Math.max(0, actualTimeSeconds);
+  };
+
   const calculateTheoreticalFin = (machineLots: Batch[], machineId: string) => {
     if (machineLots.length === 0) return 0;
     const firstLotWithStartTime = machineLots.find(l => l.start && l.start.includes(':'));
@@ -308,12 +350,19 @@ const App: React.FC = () => {
       const fullLots = (m as any).allLots || m.lots;
       const theoreticalTarget = calculateTheoreticalFin(fullLots, m.id);
       const actualFin = m.totalShiftFin || 0;
-      const cycleAchievement = theoreticalTarget > 0 
-        ? Math.round((actualFin / theoreticalTarget) * 100) 
-        : (actualFin > 0 ? 100 : 0); 
+      
+      const standardTime = calculateStandardTime(fullLots, m.id);
+      const actualTime = calculateActualTime(fullLots);
+      
+      const cycleAchievement = actualTime > 0 
+        ? Math.round((standardTime / actualTime) * 100) 
+        : (standardTime > 0 ? 100 : 0); 
+        
       return {
         ...m,
         targetFin: theoreticalTarget,
+        standardTime,
+        actualTime,
         cycleAchievement: Math.min(cycleAchievement, 150)
       };
     });
@@ -335,15 +384,17 @@ const App: React.FC = () => {
     const activeMachines = filteredMachines;
     let totalSet = 0;
     let totalFin = 0;
-    let totalTarget = 0;
+    let totalStandardTime = 0;
+    let totalActualTime = 0;
     activeMachines.forEach(m => {
       totalSet += m.totalShiftSet || 0;
       totalFin += m.totalShiftFin || 0;
-      totalTarget += (m as any).targetFin || 0;
+      totalStandardTime += (m as any).standardTime || 0;
+      totalActualTime += (m as any).actualTime || 0;
     });
     const setAchievement = totalSet > 0 ? Math.round((totalFin / totalSet) * 100) : 0;
-    const cycleAchievement = totalTarget > 0 ? Math.round((totalFin / totalTarget) * 100) : 0;
-    return { totalSet, totalFin, setAchievement, cycleAchievement };
+    const cycleAchievement = totalActualTime > 0 ? Math.round((totalStandardTime / totalActualTime) * 100) : 0;
+    return { totalSet, totalFin, setAchievement, cycleAchievement: Math.min(cycleAchievement, 150) };
   }, [filteredMachines]);
 
   const reportMachine = useMemo(() => 

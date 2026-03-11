@@ -168,6 +168,7 @@
             next: "Next",
             page: "Page",
             of: "of",
+            shift_plan_progress: "Shift Plan Progress",
             production_achievement: "Production Achievement",
             cycle_efficiency: "Efficiency",
             auto_refresh: "Refresh",
@@ -208,6 +209,7 @@
             next: "अगला",
             page: "पृष्ठ",
             of: "का",
+            shift_plan_progress: "शिफ्ट योजना प्रगति",
             production_achievement: "उत्पादन उपलब्धि",
             cycle_efficiency: "चक्र दक्षता",
             auto_refresh: "ऑटो-रिफ्रेश",
@@ -248,6 +250,7 @@
             next: "આગળ",
             page: "પૃષ્ઠ",
             of: "નું",
+            shift_plan_progress: "શિફ્ટ યોજના પ્રગતિ",
             production_achievement: "ઉત્પાદન સિદ્ધિ",
             cycle_efficiency: "સાયકલ કાર્યક્ષમતા",
             auto_refresh: "ઓટો-રિફ્રેશ",
@@ -288,6 +291,7 @@
             next: "下一頁",
             page: "頁",
             of: "共",
+            shift_plan_progress: "班次计划进度",
             production_achievement: "生產達成情況",
             cycle_efficiency: "循環效率",
             auto_refresh: "自動更新",
@@ -355,7 +359,7 @@
               <div className="px-3 py-2 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex flex-col gap-2 shrink-0">
                 <div className="space-y-1">
                   <div className="flex items-center justify-between text-[8px] md:text-[10px] font-bold uppercase tracking-tight">
-                    <span className="text-slate-400">Shift Plan Progress</span>
+                    <span className="text-slate-400">{t('shift_plan_progress')}</span>
                     <span className="text-primary font-black">{totalFin} / {totalSet} ({planPercentage}%)</span>
                   </div>
                   <div className="relative w-full h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden border border-slate-200 dark:border-slate-600">
@@ -366,7 +370,7 @@
                 <div className="space-y-1 group cursor-pointer" onClick={() => onOpenReport(machine.id)} title="Click to view detailed calculation report">
                   <div className="flex items-center justify-between text-[8px] md:text-[10px] font-bold uppercase tracking-tight">
                     <div className="flex items-center gap-1">
-                      <span className="text-slate-400">Cycle Efficiency</span>
+                      <span className="text-slate-400">{t('cycle_efficiency')}</span>
                       <span className="material-icons-round text-[10px] text-slate-300 group-hover:text-brand-orange transition-colors">info</span>
                     </div>
                     <span className={`${cyclePercentage < 90 ? 'text-red-500' : 'text-brand-orange'} font-black`}>{totalFin} / {targetFin} ({cyclePercentage}%)</span>
@@ -658,6 +662,48 @@
             return d.getTime();
           };
 
+          const calculateStandardTime = (machineLots, machineId) => {
+            let standardTime = 0;
+            let lotsWithFin = 0;
+            for (let i = 0; i < machineLots.length; i++) {
+              const lot = machineLots[i];
+              if (lot.fin > 0) {
+                let batchCycleSeconds = 180;
+                if (machineId === 'CHE03' || machineId === 'CHE04') {
+                  const chemicalCycle = cycleTimes.find(ct => ct.name.toUpperCase() === 'CHEMICAL');
+                  batchCycleSeconds = chemicalCycle ? chemicalCycle.time : 180;
+                } else {
+                  const cycleTimeObj = cycleTimes.find(ct => {
+                    const lotSpec = lot.spec.toUpperCase().trim();
+                    const cycleSpec = ct.name.toUpperCase().trim();
+                    return lotSpec === cycleSpec || lotSpec.includes(cycleSpec) || cycleSpec.includes(lotSpec);
+                  });
+                  batchCycleSeconds = cycleTimeObj ? cycleTimeObj.time : 180;
+                }
+                standardTime += lot.fin * batchCycleSeconds;
+                lotsWithFin++;
+              }
+            }
+            
+            if (lotsWithFin > 1) {
+              if (machineId === 'CHE03' || machineId === 'CHE04') {
+                standardTime += (lotsWithFin - 1) * 150;
+              }
+            }
+            return standardTime;
+          };
+
+          const calculateActualTime = (machineLots) => {
+            if (machineLots.length === 0) return 0;
+            const firstLotWithStartTime = machineLots.find(l => l.start && l.start.includes(':'));
+            if (!firstLotWithStartTime) return 0;
+            const firstStartTimestamp = parseDateTimeToSeconds(firstLotWithStartTime.start);
+            if (!firstStartTimestamp) return 0;
+            const nowTimestamp = currentTime.getTime();
+            let actualTimeSeconds = (nowTimestamp - firstStartTimestamp) / 1000;
+            return Math.max(0, actualTimeSeconds);
+          };
+
           const calculateTheoreticalFin = (machineLots, machineId) => {
             if (machineLots.length === 0) return 0;
             const firstLotWithStartTime = machineLots.find(l => l.start && l.start.includes(':'));
@@ -876,12 +922,19 @@
               const fullLots = m.allLots || m.lots;
               const theoreticalTarget = calculateTheoreticalFin(fullLots, m.id);
               const actualFin = m.totalShiftFin || 0;
-              const cycleAchievement = theoreticalTarget > 0 
-                ? Math.round((actualFin / theoreticalTarget) * 100) 
-                : (actualFin > 0 ? 100 : 0); 
+              
+              const standardTime = calculateStandardTime(fullLots, m.id);
+              const actualTime = calculateActualTime(fullLots);
+              
+              const cycleAchievement = actualTime > 0 
+                ? Math.round((standardTime / actualTime) * 100) 
+                : (standardTime > 0 ? 100 : 0); 
+                
               return {
                 ...m,
                 targetFin: theoreticalTarget,
+                standardTime,
+                actualTime,
                 cycleAchievement: Math.min(cycleAchievement, 150)
               };
             });
@@ -903,15 +956,17 @@
             const activeMachines = filteredMachines;
             let totalSet = 0;
             let totalFin = 0;
-            let totalTarget = 0;
+            let totalStandardTime = 0;
+            let totalActualTime = 0;
             activeMachines.forEach(m => {
               totalSet += m.totalShiftSet || 0;
               totalFin += m.totalShiftFin || 0;
-              totalTarget += m.targetFin || 0;
+              totalStandardTime += m.standardTime || 0;
+              totalActualTime += m.actualTime || 0;
             });
             const setAchievement = totalSet > 0 ? Math.round((totalFin / totalSet) * 100) : 0;
-            const cycleAchievement = totalTarget > 0 ? Math.round((totalFin / totalTarget) * 100) : 0;
-            return { totalSet, totalFin, setAchievement, cycleAchievement };
+            const cycleAchievement = totalActualTime > 0 ? Math.round((totalStandardTime / totalActualTime) * 100) : 0;
+            return { totalSet, totalFin, setAchievement, cycleAchievement: Math.min(cycleAchievement, 150) };
           }, [filteredMachines]);
 
           const reportMachine = useMemo(() => 
